@@ -1,3 +1,3 @@
 export const getStatus = (req, res) => {
-  res.json({ message: "☕ WolfCafe+ backends running..." });
+  res.json({ message: "☕ WolfCafe+ backend running..." });
 };
