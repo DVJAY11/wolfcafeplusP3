@@ -6,6 +6,8 @@ import apiRoutes from "./api/routes/index.js";
 import authRoutes from "./api/routes/authRoutes.js";
 import { verifyToken } from "./api/middleware/authMiddleware.js";
 import { allowRoles } from "./api/middleware/roleMiddleware.js";
+import menuRoutes from "./api/routes/menuRoutes.js";
+import cartRoutes from "./api/routes/cartRoutes.js";
 
 dotenv.config();
 
@@ -15,10 +17,12 @@ app.use(cors());
 
 connectDB();
 
-
 // import routes here
 app.use("/api/auth", authRoutes);
 app.use("/api", apiRoutes);
+
+app.use("/api/menu", menuRoutes);
+app.use("/api/cart", cartRoutes);
 
 // protected route
 app.get("/api/admin", verifyToken, allowRoles("admin"), (req, res) => {
