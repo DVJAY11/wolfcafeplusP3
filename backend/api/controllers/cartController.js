@@ -13,19 +13,18 @@ export const getCart = async (req, res) => {
 // POST /api/cart → add/update item
 export const addToCart = async (req, res) => {
   try {
-    const { menuItemId, quantity } = req.body;
-    let cart = await Cart.findOne({ user: req.user.id });
+    const userId = req.user._id; // from JWT middleware
+    const { menuItem, quantity } = req.body;
 
-    if (!cart) cart = new Cart({ user: req.user.id, items: [] });
+    let cart = await Cart.findOne({ user: userId });
+    if (!cart) cart = new Cart({ user: userId, items: [] });
 
-    const item = cart.items.find(i => i.menuItem.toString() === menuItemId);
-    if (item) item.quantity += quantity;
-    else cart.items.push({ menuItem: menuItemId, quantity });
-
+    cart.items.push({ menuItem, quantity });
     await cart.save();
-    res.json(cart);
+
+    res.status(200).json({ message: "Item added to cart", cart });
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    res.status(500).json({ message: "Error adding to cart", error: err.message });
   }
 };
 
