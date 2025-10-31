@@ -40,6 +40,7 @@ cd wolfcafeplus
 2. Setup backend
 cd backend
 npm install
+npm install express mongoose dotenv cors nodemon
 
 Create .env:
 PORT=5000
