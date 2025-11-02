@@ -58,3 +58,7 @@ npm install
 npm start
 
 Frontend → http://localhost:3000
+
+### Code coverage
+npm install --save-dev jest supertest mongodb-memory-server
+npm install --save-dev jest babel-jest @babel/preset-env
