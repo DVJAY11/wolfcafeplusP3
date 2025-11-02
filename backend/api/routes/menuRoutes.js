@@ -3,7 +3,9 @@ import {
   getMenu,
   addMenuItem,
   updateMenuItem,
-  deleteMenuItem
+  deleteMenuItem,
+  softDeleteMenuItem,
+  restoreMenuItem
 } from "../controllers/menuController.js";
 import { verifyToken } from "../middleware/authMiddleware.js";
 import { allowRoles } from "../middleware/roleMiddleware.js";
@@ -17,5 +19,7 @@ router.get("/", getMenu);
 router.post("/", verifyToken, allowRoles("admin"), addMenuItem);
 router.put("/:id", verifyToken, allowRoles("admin"), updateMenuItem);
 router.delete("/:id", verifyToken, allowRoles("admin"), deleteMenuItem);
+router.patch("/:id/archive", verifyToken, allowRoles("admin"), softDeleteMenuItem);
+router.patch("/:id/restore", verifyToken, allowRoles("admin"), restoreMenuItem);
 
 export default router;
