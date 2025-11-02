@@ -43,13 +43,13 @@ npm install
 npm install express mongoose dotenv cors nodemon
 
 Create .env:
-PORT=5050
+PORT=5000
 MONGO_URI=mongodb://localhost:27017/wolfcafeplus
 
 Run:
 npm run dev
 
-Backend → http://localhost:5050
+Backend → http://localhost:5000
 
 3. Setup frontend
 
