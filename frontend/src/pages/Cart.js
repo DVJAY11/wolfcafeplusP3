@@ -68,7 +68,7 @@ export default function Cart() {
 
   return (
     <div className="p-6 max-w-3xl mx-auto">
-      <h1 className="text-3xl font-bold text-amber-800 mb-6">Your Cart</h1>
+      <h1 className="text-3xl font-bold text-red-800 mb-6">Your Cart</h1>
 
       {/* Cart items */}
       {cart.map((item, index) => {
