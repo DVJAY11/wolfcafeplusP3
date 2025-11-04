@@ -7,4 +7,10 @@ module.exports = {
     extend: {},
   },
   plugins: [],
+  
+  extend: {
+  fontFamily: {
+    oswald: ['Oswald', 'sans-serif'],
+  },
+}
 }
