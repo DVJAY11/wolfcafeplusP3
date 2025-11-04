@@ -30,6 +30,7 @@ function App() {
       <ModalProvider>
         <CartProvider>
           <Router>
+            <PageWrapper>
             <Navbar />
             <Routes>
               {/* 🌐 Public routes */}
@@ -53,6 +54,7 @@ function App() {
                 </Route>
             </Route>
             </Routes>
+            </PageWrapper>
           </Router>
         </CartProvider>
       </ModalProvider>
