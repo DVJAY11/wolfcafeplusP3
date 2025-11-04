@@ -57,7 +57,7 @@ export default function Home() {
       </section>
 
       {/* Gallery Section */}
-      <section className="bg-gray-50 py-6">
+      <section className="bg-gray-50 py-1">
         <div className="overflow-x-auto whitespace-nowrap scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
           {images.map((src, i) => (
             <img

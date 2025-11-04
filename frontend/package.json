@@ -2,7 +2,7 @@
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://localhost:5000",
+  "proxy": "http://localhost:5050",
   "dependencies": {
     "@fontsource/graduate": "^5.2.7",
     "@tailwindcss/postcss": "^4.1.16",

@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import Menu from "./pages/Menu";
@@ -15,6 +15,14 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import ManageOrders from "./pages/admin/ManageOrders";
 import ManageItems from "./pages/admin/ManageItems";
 import { ModalProvider } from "./context/ModalContext";
+
+// ✅ Wrapper to handle conditional padding
+function PageWrapper({ children }) {
+  const location = useLocation();
+  const isHome = location.pathname === "/"; // only homepage stays transparent
+
+  return <div className={isHome ? "" : "pt-24"}>{children}</div>;
+}
 
 function App() {
   return (
