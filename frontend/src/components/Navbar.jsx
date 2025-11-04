@@ -20,15 +20,18 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // handle login or signup
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     try {
       if (isSignup) {
+        // --- Sign Up API call ---
         await api.post("/auth/register", formData);
         alert("Account created successfully! Please log in.");
         setIsSignup(false);
       } else {
+        // --- Login (existing AuthContext logic) ---
         await login(formData.email, formData.password);
         setShowModal(false);
       }
@@ -72,14 +75,22 @@ export default function Navbar() {
             <span>Cart</span>
             <span className="text-sm bg-red-600 text-white px-1.5 rounded-full">0</span>
           </Link>
+          {user?.role === "admin" && (
+            <Link to="/admin" className="hover:text-red-500 transition flex items-center gap-2">Admin</Link>
+          )}
+        </div>
 
+        <div className="flex items-center gap-3">
           {user ? (
-            <button
-              onClick={logout}
-              className="bg-white hover:bg-gray-100 text-red-700 px-3 py-1 rounded-full font-semibold"
-            >
-              Logout
-            </button>
+            <>
+              <span className="text-sm text-white-600">Welcome, {user.name}</span>
+              <button
+                onClick={logout}
+                className="bg-white hover:bg-gray-100 text-red-700 px-3 py-1 rounded-full font-semibold"
+              >
+                Logout
+              </button>
+            </>
           ) : (
             <button
               onClick={() => setShowModal(true)}
