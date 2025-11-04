@@ -21,7 +21,7 @@ export default function MenuItemCard({ item }) {
   };
 
   return (
-    <div className="bg-gray-300 rounded-2xl shadow hover:shadow-lg p-4 flex flex-col transition">
+    <div className="bg-orange-50 rounded-2xl shadow hover:shadow-lg p-4 flex flex-col transition">
       <img
         src={item.image || "/placeholder.jpg"}
         alt={item.name || "Menu item"}
