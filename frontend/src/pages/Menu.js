@@ -32,10 +32,11 @@ export default function Menu() {
     );
 
   return (
-    <div className="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+    <div className="bg-white p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
       {menu.map((item) => (
         <MenuItemCard key={item._id || item.id} item={item} onAdd={() => addToCart(item)} />
       ))}
     </div>
+    
   );
 }
