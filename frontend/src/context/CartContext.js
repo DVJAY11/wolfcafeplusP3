@@ -1,6 +1,7 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import { AuthContext } from "./AuthContext";
 import { useModal } from "./ModalContext";
+import api from "../api/axios";
 
 const CartContext = createContext();
 export const useCart = () => useContext(CartContext);
@@ -10,36 +11,75 @@ export const CartProvider = ({ children }) => {
   const { user } = useContext(AuthContext);
   const { showLoginModal } = useModal();
 
-  const addToCart = (item) => {
+  // Fetch cart when user logs in
+  useEffect(() => {
+    const fetchCart = async () => {
+      if (!user) {
+        setCart([]); // clear cart on logout
+        return;
+      }
+      try {
+        const res = await api.get("/cart");
+        // backend returns { cart: {...} }
+        setCart(res.data.cart?.items || []);
+      } catch (err) {
+        console.error("Failed to fetch cart:", err);
+      }
+    };
+    fetchCart();
+  }, [user]);
+
+  // Update cart on backend (+1, -1, etc.)
+  const updateCartItem = async (item, change = 1) => {
     if (!user) {
-      localStorage.setItem("pendingItem", JSON.stringify(item));
       showLoginModal();
       return;
     }
 
-    setCart((prev) => {
-      const existing = prev.find((p) => p._id === item._id);
-      return existing
-        ? prev.map((p) =>
-            p._id === item._id ? { ...p, qty: p.qty + 1 } : p
-          )
-        : [...prev, { ...item, qty: 1 }];
-    });
+    try {
+      const res = await api.post("/cart", {
+        menuItem: item._id,
+        quantity: change,
+      });
+      setCart(res.data.cart?.items || []);
+    } catch (err) {
+      console.error("Error updating cart:", err.response?.data || err);
+    }
   };
 
-  const removeFromCart = (id) =>
-    setCart((prev) => prev.filter((p) => p._id !== id));
+  // ➕ Increment quantity
+  const incrementItem = (item) => updateCartItem(item, 1);
 
-  const updateQty = (id, qty) =>
-    setCart((prev) =>
-      prev.map((p) => (p._id === id ? { ...p, qty } : p))
-    );
+  // ➖ Decrement quantity
+  const decrementItem = (item) => updateCartItem(item, -1);
 
+  // Remove item completely
+  const removeFromCart = async (menuItemId) => {
+    if (!user) return;
+    try {
+      const res = await api.delete(`/cart/${menuItemId}`);
+      setCart(res.data.cart?.items || []);
+    } catch (err) {
+      console.error("Error removing from cart:", err);
+    }
+  };
+
+  // Clear local cart (logout or cleanup)
   const clearCart = () => setCart([]);
+
+  // Shortcut alias
+  const addToCart = (item) => incrementItem(item);
 
   return (
     <CartContext.Provider
-      value={{ cart, addToCart, removeFromCart, updateQty, clearCart }}
+      value={{
+        cart,
+        addToCart,
+        incrementItem,
+        decrementItem,
+        removeFromCart,
+        clearCart,
+      }}
     >
       {children}
     </CartContext.Provider>

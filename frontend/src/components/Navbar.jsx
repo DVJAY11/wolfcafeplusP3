@@ -2,13 +2,14 @@ import React, { useContext, useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { useModal } from "../context/ModalContext";
+import { useCart } from "../context/CartContext"; // ✅ import this
 import api from "../api/axios";
-import { ShoppingCart } from "lucide-react"; // cart icon
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"></link>
+import { ShoppingCart } from "lucide-react";
 
 export default function Navbar() {
   const { user, logout, login } = useContext(AuthContext);
   const { showLogin, showLoginModal, hideLoginModal } = useModal();
+  const { cart } = useCart();
   const [isSignup, setIsSignup] = useState(false);
   const [formData, setFormData] = useState({ name: "", email: "", password: "" });
   const [error, setError] = useState("");
@@ -20,6 +21,9 @@ export default function Navbar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Calculate total items in cart (sum of all quantities)
+  const totalItems = cart.reduce((sum, item) => sum + (item.quantity || item.qty || 0), 0);
 
   // handle login or signup
   const handleSubmit = async (e) => {
@@ -53,29 +57,36 @@ export default function Navbar() {
             : "bg-black/90 text-white shadow-md"
         }`}
       >
-        {/* Left: Logo + Name */}
+        {/* Logo */}
         <Link to="/" className="flex items-center space-x-3">
           <img
-          src="/logo.png"
-          alt="WolfCafe Logo"
-          className="h-16 w-16 object-contain"
-          style={{ marginRight: "0.05rem" }}
-/>
-        <span className="text-4xl tracking-widest font-bold">
-          <span style={{ fontFamily: "'Anton', sans-serif" }} className="text-white">WOLF</span>
-          <span style={{ fontFamily: "'Playfair Display', serif" }} className="text-red-600 ml-1">CAFE+</span>
-        </span>
+            src="/logo.png"
+            alt="WolfCafe Logo"
+            className="h-16 w-16 object-contain"
+            style={{ marginRight: "0.05rem" }}
+          />
+          <span className="text-4xl tracking-widest font-bold">
+            <span style={{ fontFamily: "'Anton', sans-serif" }} className="text-white">WOLF</span>
+            <span style={{ fontFamily: "'Playfair Display', serif" }} className="text-red-600 ml-1">CAFE+</span>
+          </span>
         </Link>
 
-        {/* Right: Navigation links */}
-        <div className="flex items-center space-x-10 text-base font-medium">
+        {/* Navigation Links */}
+        <div className="flex items-center space-x-8 text-base font-medium">
           <Link to="/" className="hover:text-red-500 transition">Home</Link>
           <Link to="/menu" className="hover:text-red-500 transition">Menu</Link>
-          <Link to="/cart" className="hover:text-red-500 transition flex items-center gap-2">
+
+          {/* Cart Badge Updated Dynamically */}
+          <Link to="/cart" className="hover:text-red-500 transition flex items-center gap-2 relative">
             <ShoppingCart size={18} />
             <span>Cart</span>
-            <span className="text-sm bg-red-600 text-white px-1.5 rounded-full">0</span>
+            {totalItems > 0 && (
+              <span className="absolute -top-2 -right-3 bg-red-600 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
+                {totalItems}
+              </span>
+            )}
           </Link>
+
           {user?.role === "admin" && (
             <Link to="/admin" className="hover:text-red-500 transition flex items-center gap-2">Admin</Link>
           )}
