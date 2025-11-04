@@ -12,6 +12,15 @@ export default function AuthProvider({ children }) {
     const { data } = await api.post("/auth/login", { email, password });
     localStorage.setItem("token", data.token);
     setUser(data.user);
+
+    // auto-add pending item if exists
+    const pendingItem = localStorage.getItem("pendingItem");
+    if (pendingItem) {
+      const item = JSON.parse(pendingItem);
+      // call cart API or use addToCart() from CartContext
+      await api.post("/cart", { menuItem: item._id, quantity: 1 });
+      localStorage.removeItem("pendingItem");
+    }
   };
 
   // Logout
