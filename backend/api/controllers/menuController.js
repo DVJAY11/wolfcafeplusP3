@@ -1,9 +1,22 @@
 import MenuItem from "../models/MenuItem.js";
 
 // GET /api/menu → all items
+// export const getMenu = async (req, res) => {
+//   try {
+//     const items = await MenuItem.find({ available: true });
+//     res.status(200).json(items);
+//   } catch (err) {
+//     res.status(500).json({ message: err.message });
+//   }
+// };
+
+// GET /api/menu → all items (or available only)
 export const getMenu = async (req, res) => {
   try {
-    const items = await MenuItem.find({ available: true });
+    const showAll = req.query.all === "true"; // 👈 added line
+    const items = showAll
+      ? await MenuItem.find().sort({ name: 1 })
+      : await MenuItem.find({ available: true }).sort({ name: 1 });
     res.status(200).json(items);
   } catch (err) {
     res.status(500).json({ message: err.message });

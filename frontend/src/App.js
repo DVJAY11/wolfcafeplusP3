@@ -4,11 +4,11 @@ import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import Menu from "./pages/Menu";
 import Cart from "./pages/Cart";
-// import AdminDashboard from "./pages/AdminDashboard";
 import Login from "./pages/Login";
 import { CartProvider } from "./context/CartContext";
 import AuthProvider from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AdminProtectedRoute from "./components/AdminProtectedRoute";
 
 import AdminLayout from "./pages/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -22,21 +22,25 @@ function App() {
         <Router>
           <Navbar />
           <Routes>
-            {/* public routes */}
+            {/* 🌐 Public routes */}
             <Route path="/" element={<Home />} />
             <Route path="/menu" element={<Menu />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/login" element={<Login />} />
 
-            {/* protected routes */}
-            {/* <Route element={<ProtectedRoute />}>
-              <Route path="/admin" element={<AdminDashboard />} />
-            </Route> */}
-            {/* Admin nested routes */}
-            <Route path="/admin" element={<AdminLayout />}>
-              <Route index element={<AdminDashboard />} />
-              <Route path="orders" element={<ManageOrders />} />
-              <Route path="items" element={<ManageItems />} />
+            {/* 🔒 Authenticated (non-admin) protected routes */}
+            <Route element={<ProtectedRoute />}>
+              {/* example placeholder; you can add user-only routes here */}
+              {/* <Route path="/profile" element={<UserProfile />} /> */}
+            </Route>
+
+            {/* 🧑‍💼 Admin-only protected routes */}
+            <Route element={<AdminProtectedRoute />}>
+              <Route path="/admin" element={<AdminLayout />}>
+                <Route index element={<AdminDashboard />} />
+                <Route path="orders" element={<ManageOrders />} />
+                <Route path="items" element={<ManageItems />} />
+              </Route>
             </Route>
           </Routes>
         </Router>
