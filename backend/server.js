@@ -11,7 +11,7 @@ import { allowRoles } from "./api/middleware/roleMiddleware.js";
 import menuRoutes from "./api/routes/menuRoutes.js";
 import cartRoutes from "./api/routes/cartRoutes.js";
 import orderRoutes from "./api/routes/orderRoutes.js";
-
+import adminRoutes from "./api/routes/adminRoutes.js";
 dotenv.config();
 
 const app = express();
@@ -20,12 +20,12 @@ app.use(cors());
 
 connectDB();
 
-app.use("/api/auth", authRoutes);
 app.use("/api", apiRoutes);
 app.use("/api/menu", menuRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
-
+app.use("/api/admin", adminRoutes);
+app.use("/api/auth", authRoutes);
 // Protected routes
 app.get("/api/admin", verifyToken, allowRoles("admin"), (req, res) => {
   res.send("Welcome Admin!");
@@ -46,7 +46,7 @@ io.on("connection", (socket) => {
 });
 
 // ---------- START SERVER ----------
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5050;
 
 if (process.env.NODE_ENV !== "test") {
   server.listen(PORT, () => console.log(`Server running on port ${PORT}`));

@@ -9,36 +9,25 @@ export default function AdminDashboard() {
     totalOrders: 0,
     totalRevenue: 0,
   });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const [usersRes, menuRes, cartRes] = await Promise.all([
-          api.get("/auth/users"),
-          api.get("/menu"),
-          api.get("/cart"),
-        ]);
-
-        const totalRevenue = cartRes.data.reduce((sum, c) => {
-          const cartTotal = c.items?.reduce(
-            (acc, i) => acc + (i.menuItem?.price || 0) * i.quantity,
-            0
-          );
-          return sum + (cartTotal || 0);
-        }, 0);
-
-        setStats({
-          totalUsers: usersRes.data.length,
-          totalMenuItems: menuRes.data.length,
-          totalOrders: cartRes.data.length,
-          totalRevenue: totalRevenue.toFixed(2),
-        });
+        // ✅ Use your new backend route
+        const res = await api.get("/admin/stats");
+        console.log("Fetched stats:", res.data);
+        setStats(res.data);
       } catch (err) {
         console.error("Error fetching stats:", err);
+      } finally {
+        setLoading(false);
       }
     };
     fetchStats();
   }, []);
+
+  if (loading) return <p className="p-6 text-gray-600">Loading metrics...</p>;
 
   return (
     <div>
@@ -48,7 +37,12 @@ export default function AdminDashboard() {
         <StatCard icon={<FaUser />} title="Users" value={stats.totalUsers} color="bg-amber-100" />
         <StatCard icon={<FaCoffee />} title="Menu Items" value={stats.totalMenuItems} color="bg-yellow-100" />
         <StatCard icon={<FaShoppingCart />} title="Orders" value={stats.totalOrders} color="bg-orange-100" />
-        <StatCard icon={<FaMoneyBillWave />} title="Revenue" value={`$${stats.totalRevenue}`} color="bg-green-100" />
+        <StatCard
+          icon={<FaMoneyBillWave />}
+          title="Revenue"
+          value={`$${stats.totalRevenue.toFixed(2)}`}
+          color="bg-green-100"
+        />
       </div>
     </div>
   );
