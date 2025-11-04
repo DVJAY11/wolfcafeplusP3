@@ -1,7 +1,9 @@
-import React, { useContext, useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useContext, useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
-import api from "../api/axios"; // your configured axios instance
+import api from "../api/axios";
+import { ShoppingCart } from "lucide-react"; // cart icon
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"></link>
 
 export default function Navbar() {
   const { user, logout, login } = useContext(AuthContext);
@@ -9,19 +11,24 @@ export default function Navbar() {
   const [isSignup, setIsSignup] = useState(false);
   const [formData, setFormData] = useState({ name: "", email: "", password: "" });
   const [error, setError] = useState("");
+  const location = useLocation();
+  const [scrolled, setScrolled] = useState(false);
 
-  // handle login or signup
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     try {
       if (isSignup) {
-        // --- Sign Up API call ---
         await api.post("/auth/register", formData);
         alert("Account created successfully! Please log in.");
         setIsSignup(false);
       } else {
-        // --- Login (existing AuthContext logic) ---
         await login(formData.email, formData.password);
         setShowModal(false);
       }
@@ -31,34 +38,52 @@ export default function Navbar() {
     }
   };
 
+  const transparent = location.pathname === "/" && !scrolled;
+
   return (
     <>
-      {/* 🔸 Navbar */}
-      <nav className="bg-amber-600 text-white px-6 py-3 flex justify-between items-center">
-        <div className="flex space-x-4">
-          <Link to="/" className="hover:text-yellow-200 font-semibold">Home</Link>
-          <Link to="/menu" className="hover:text-yellow-200 font-semibold">Menu</Link>
-          <Link to="/cart" className="hover:text-yellow-200 font-semibold">Cart</Link>
-          {user?.role === "admin" && (
-            <Link to="/admin" className="hover:text-yellow-200 font-semibold">Admin</Link>
-          )}
-        </div>
+      <nav
+        className={`fixed top-0 left-0 w-full z-50 flex justify-between items-center px-10 py-4 transition-colors duration-300 ${
+          transparent
+            ? "bg-transparent text-white"
+            : "bg-black/90 text-white shadow-md"
+        }`}
+      >
+        {/* Left: Logo + Name */}
+        <Link to="/" className="flex items-center space-x-3">
+          <img
+          src="/logo.png"
+          alt="WolfCafe Logo"
+          className="h-16 w-16 object-contain"
+          style={{ marginRight: "0.05rem" }}
+/>
+        <span className="text-4xl tracking-widest font-bold">
+          <span style={{ fontFamily: "'Anton', sans-serif" }} className="text-white">WOLF</span>
+          <span style={{ fontFamily: "'Playfair Display', serif" }} className="text-red-600 ml-1">CAFE+</span>
+        </span>
+        </Link>
 
-        <div className="flex items-center gap-3">
+        {/* Right: Navigation links */}
+        <div className="flex items-center space-x-8 text-base font-medium">
+          <Link to="/" className="hover:text-red-500 transition">Home</Link>
+          <Link to="/menu" className="hover:text-red-500 transition">Menu</Link>
+          <Link to="/cart" className="hover:text-red-500 transition flex items-center gap-2">
+            <ShoppingCart size={18} />
+            <span>Cart</span>
+            <span className="text-sm bg-red-600 text-white px-1.5 rounded-full">0</span>
+          </Link>
+
           {user ? (
-            <>
-              <span className="text-sm text-yellow-100">Welcome, {user.name}</span>
-              <button
-                onClick={logout}
-                className="bg-yellow-300 hover:bg-yellow-400 text-gray-700 px-3 py-1 rounded font-semibold"
-              >
-                Logout
-              </button>
-            </>
+            <button
+              onClick={logout}
+              className="bg-white hover:bg-gray-100 text-red-700 px-3 py-1 rounded-full font-semibold"
+            >
+              Logout
+            </button>
           ) : (
             <button
               onClick={() => setShowModal(true)}
-              className="bg-white hover:bg-gray-100 text-amber-600 px-3 py-1 rounded font-semibold"
+              className="bg-white hover:bg-gray-100 text-red-700 px-3 py-1 rounded-full font-semibold"
             >
               Login
             </button>
@@ -66,9 +91,9 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* 🔸 Login / Signup Modal */}
+      {/* 🔸 Login / Signup Modal (unchanged) */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-[100]">
           <div className="bg-white p-6 rounded-lg w-80 shadow-lg relative">
             <button
               onClick={() => setShowModal(false)}
@@ -89,7 +114,7 @@ export default function Navbar() {
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   required
-                  className="w-full border border-gray-300 rounded-md p-2 mb-3 focus:ring-2 focus:ring-yellow-400"
+                  className="w-full border border-gray-300 rounded-md p-2 mb-3 focus:ring-2 focus:ring-red-400"
                 />
               )}
               <input
@@ -98,7 +123,7 @@ export default function Navbar() {
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 required
-                className="w-full border border-gray-300 rounded-md p-2 mb-3 focus:ring-2 focus:ring-yellow-400"
+                className="w-full border border-gray-300 rounded-md p-2 mb-3 focus:ring-2 focus:ring-red-400"
               />
               <input
                 type="password"
@@ -106,13 +131,13 @@ export default function Navbar() {
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 required
-                className="w-full border border-gray-300 rounded-md p-2 mb-3 focus:ring-2 focus:ring-yellow-400"
+                className="w-full border border-gray-300 rounded-md p-2 mb-3 focus:ring-2 focus:ring-red-400"
               />
               {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
 
               <button
                 type="submit"
-                className="w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold py-2 rounded-md"
+                className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2 rounded-md"
               >
                 {isSignup ? "Sign Up" : "Login"}
               </button>
@@ -124,7 +149,7 @@ export default function Navbar() {
                   Already have an account?{" "}
                   <button
                     onClick={() => setIsSignup(false)}
-                    className="text-amber-600 underline"
+                    className="text-red-600 underline"
                   >
                     Login
                   </button>
@@ -134,7 +159,7 @@ export default function Navbar() {
                   Don’t have an account?{" "}
                   <button
                     onClick={() => setIsSignup(true)}
-                    className="text-amber-600 underline"
+                    className="text-red-600 underline"
                   >
                     Sign up
                   </button>
