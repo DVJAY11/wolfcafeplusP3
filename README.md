@@ -55,7 +55,7 @@ npm install && cd frontend && npm install
 npm run dev
 ```
 
-> Default backend runs on port 5000, frontend on 3000.  
+> Default backend runs on port 5050, frontend on 3000.  
 > Requires MongoDB URI in `.env`.
 
 ---
