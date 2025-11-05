@@ -18,8 +18,10 @@ export default function ManageOrders() {
 
   const handleStatusChange = async (id, newStatus) => {
     try {
-      await axios.patch(`/orders/${id}`, { status: newStatus });
-      fetchOrders(); // refresh after update
+      const res = await axios.patch(`/orders/${id}`, { status: newStatus });
+      setOrders((prev) =>
+        prev.map((o) => (o._id === id ? res.data : o))
+      );
     } catch (err) {
       console.error("Error updating order:", err);
     }
