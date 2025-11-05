@@ -1,4 +1,4 @@
-# 🐺 WolfCafe+
+# 🐺 WRIKICAFE+
 
 ![React](https://img.shields.io/badge/React-19.2.0-61dafb?logo=react&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-4.0-646cff?logo=vite&logoColor=white)
