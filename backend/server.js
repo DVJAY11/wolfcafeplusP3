@@ -21,6 +21,7 @@ app.use(express.json());
 // Explicitly allow frontend origins (production + local dev)
 const allowedOrigins = [
   "https://wrikicafe-vqm0.onrender.com", // deployed frontend
+  "https://wrikicafe.onrender.com",
   "http://localhost:3000"                // local dev
 ];
 
