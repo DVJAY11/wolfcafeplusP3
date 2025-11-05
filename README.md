@@ -4,9 +4,6 @@
 [![Style Check – ESLint](https://img.shields.io/badge/code%20style-eslint-blue.svg)](https://eslint.org/)
 [![Formatter – Prettier](https://img.shields.io/badge/formatter-prettier-ff69b4.svg)](https://prettier.io/)
 [![Syntax – Babel](https://img.shields.io/badge/syntax-babel-yellow.svg)](https://babeljs.io/)
-[![Test Coverage – Jest](https://img.shields.io/badge/coverage-85%25-green.svg)](https://jestjs.io/)
-[![Build – GitHub Actions](https://github.com/RishithaRamesh/wolfcafeplus/actions/workflows/ci.yml/badge.svg)](https://github.com/RishithaRamesh/wolfcafeplus/actions)
-
 > A smarter, personalized, and social campus food-ordering system for NC State University.
 
 ---
@@ -60,24 +57,8 @@ npm install && cd frontend && npm install
 npm run dev
 ```
 
-> Default backend runs on port 5050, frontend on 5173.  
+> Default backend runs on port 5000, frontend on 3000.  
 > Requires MongoDB URI in `.env`.
-
----
-
-## 🧪 Developer Workflow
-- **Linting** → ESLint (`.eslintrc.json`)  
-- **Formatting** → Prettier (`.prettierrc`)  
-- **Syntax Checking** → Babel (`babel.config.json`)  
-- **Testing** → Jest + Supertest (backend)  
-- **Coverage Reports** → GitHub Actions workflow `ci.yml`
-
-To run checks locally:
-```bash
-npm run lint
-npm run format
-npm test -- --coverage
-```
 
 ---
 
@@ -101,14 +82,6 @@ npm test -- --coverage
 
 ---
 
-## 🧠 Documentation & Ethics
-- **Developers’ Guide:** on Wiki → _“How to add new functionality”_  
-- **Users’ Guide:** on Wiki → _“How to place and manage orders”_  
-- **Privacy Policy:** outlines data handling for user info, orders, and payments  
-- **Human Flourishing Report:** analyzes impact on well-being, inclusion, and community  
-
----
-
 ## 🧰 Tech Stack
 **Frontend:** React 19 · Vite · Axios · TailwindCSS  
 **Backend:** Node · Express · MongoDB (Mongoose)  
@@ -120,12 +93,6 @@ npm test -- --coverage
 
 ## 🧾 License
 This project is released under the terms described in [LICENSE.md](LICENSE.md).
-
----
-
-## 🌟 Acknowledgments
-NC State CSC 326 Teaching Staff — _Dr. Sandeep Kuttal, Dr. Ben Xu, and Team_  
-Starter code adapted from **CoffeeMaker** and extended by **Team 16** for the Spring 2025 iteration.
 
 ---
 
