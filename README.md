@@ -1,4 +1,4 @@
-# 🐺 WolfCafe+
+# 🐺 WRIKICAFE+
 
 ![React](https://img.shields.io/badge/React-19.2.0-61dafb?logo=react&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-4.0-646cff?logo=vite&logoColor=white)
@@ -6,7 +6,7 @@
 ![Node.js](https://img.shields.io/badge/Node.js-18%2B-43853D?logo=node.js&logoColor=white)
 ![License](https://img.shields.io/badge/License-ISC-blue)
 ![formatter](https://img.shields.io/badge/formatter-Prettier-ff69b4)
-> A smarter, personalized, and social campus food-ordering system for NC State University.
+> A smarter, personalized, and social campus food-ordering system for NC State University. || Funfact: WrikiCafe is derived from the Sanskrit word vṛkī (वृकी) meaning she-wolf ||
 
 ---
 
@@ -17,7 +17,7 @@ _Showing new functionality: role-based permissions, order tracking, and real-tim
 ---
 
 ## 🚀 Project Overview
-**WolfCafe+** is a full-stack MERN application built for CSC 326 that integrates menu management, ordering, and personalized recommendations across **Admin**, **Staff**, and **Customer** roles.
+**WrikiCafe+** is a full-stack MERN application built for CSC 326 that integrates menu management, ordering, and personalized recommendations across **Admin**, **Staff**, and **Customer** roles.
 
 | Role | Capabilities |
 |------|---------------|
@@ -49,8 +49,8 @@ See [INSTALL.md](INSTALL.md) for full setup details.
 In short:
 
 ```bash
-git clone https://github.com/RishithaRamesh/wolfcafeplus.git
-cd wolfcafeplus
+git clone https://github.com/RishithaRamesh/WrikiCafeplus.git
+cd WrikiCafeplus
 npm install && cd frontend && npm install
 npm run dev
 ```
@@ -61,11 +61,11 @@ npm run dev
 ---
 
 ## 👥 Team 16
-| Name | Role | GitHub |
-|------|------|--------|
-| **Rishitha Ramesh** | Full-Stack Developer | [@RishithaRamesh](https://github.com/RishithaRamesh) |
-| **Dhruva Kamble** | Backend Engineer | [@dhruvakamble](https://github.com/dhruvakamble) |
-| **Rujuta Budke** | Frontend Engineer | [@rujutabudke](https://github.com/rujutabudke) |
+| Name | GitHub |
+|------|--------|
+| **Dhruva Kamble** | [@DhruvaKamble](https://github.com/Dhruva0101) |
+| **Rishitha Ramesh** |  [@RishithaRamesh](https://github.com/RishithaRamesh) |
+| **Rujuta Budke** |  [@RujutaBudke](https://github.com/rujuta13) |
 
 ---
 
@@ -94,4 +94,4 @@ This project is released under the terms described in [LICENSE.md](LICENSE.md).
 
 ---
 
-© 2025 WolfCafe+ Team 16 · North Carolina State University
+© 2025 WrikiCafe+ Team 16 · North Carolina State University

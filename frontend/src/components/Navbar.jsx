@@ -75,6 +75,7 @@ export default function Navbar() {
         <div className="flex items-center space-x-8 text-base font-medium">
           <Link to="/" className="hover:text-red-500 transition">Home</Link>
           <Link to="/menu" className="hover:text-red-500 transition">Menu</Link>
+          <Link to="/about" className="hover:text-red-600">About Us</Link>
 
           {/* Cart Badge Updated Dynamically */}
           <Link to="/cart" className="hover:text-red-500 transition flex items-center gap-2 relative">

@@ -4,6 +4,7 @@ import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import Menu from "./pages/Menu";
 import Cart from "./pages/Cart";
+import AboutUs from "./pages/AboutUs"; 
 import Login from "./pages/Login";
 import { CartProvider } from "./context/CartContext";
 import AuthProvider from "./context/AuthContext";
@@ -37,6 +38,7 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/menu" element={<Menu />} />
               <Route path="/cart" element={<Cart />} />
+              <Route path="/about" element={<AboutUs />} />
               <Route path="/login" element={<Login />} />
 
               {/* 🔒 Authenticated (non-admin) protected routes */}
