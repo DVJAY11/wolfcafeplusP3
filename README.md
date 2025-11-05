@@ -1,5 +1,6 @@
 # 🐺 WRIKICAFE+
 
+[![DOI](https://zenodo.org/badge/1080009756.svg)](https://doi.org/10.5281/zenodo.17538134)
 ![React](https://img.shields.io/badge/React-19.2.0-61dafb?logo=react&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-4.0-646cff?logo=vite&logoColor=white)
 ![Vitest](https://img.shields.io/badge/Vitest-0.28.0-6DA83F?logo=vitest&logoColor=white)
