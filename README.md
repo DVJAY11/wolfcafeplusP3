@@ -61,11 +61,11 @@ npm run dev
 ---
 
 ## 👥 Team 16
-| Name | Role | GitHub |
-|------|------|--------|
-| **Rishitha Ramesh** | Full-Stack Developer | [@RishithaRamesh](https://github.com/RishithaRamesh) |
-| **Dhruva Kamble** | Backend Engineer | [@dhruvakamble](https://github.com/dhruvakamble) |
-| **Rujuta Budke** | Frontend Engineer | [@rujutabudke](https://github.com/rujutabudke) |
+| Name | GitHub |
+|------|--------|
+| **Dhruva Kamble** | [@dhruvakamble](https://github.com/dhruvakamble) |
+| **Rishitha Ramesh** |  [@RishithaRamesh](https://github.com/RishithaRamesh) |
+| **Rujuta Budke** |  [@rujutabudke](https://github.com/rujutabudke) |
 
 ---
 
