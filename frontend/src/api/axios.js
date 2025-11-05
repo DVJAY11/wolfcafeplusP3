@@ -1,12 +1,21 @@
 import axios from "axios";
 
-// Create a single configured Axios instance
+// // Create a single configured Axios instance
+// const api = axios.create({
+//   baseURL: "/api", // all requests go through the proxy
+//   headers: {
+//     "Content-Type": "application/json",
+//   },
+// });
+
+
 const api = axios.create({
-  baseURL: "/api", // all requests go through the proxy
-  headers: {
-    "Content-Type": "application/json",
-  },
+  baseURL:
+    (process.env.REACT_APP_API_BASE_URL
+      ? `${process.env.REACT_APP_API_BASE_URL}/api`
+      : "http://localhost:5000/api"),
 });
+
 
 // Automatically attach JWT token (if logged in)
 api.interceptors.request.use(
