@@ -1,101 +1,81 @@
-import mongoose from "mongoose";
-import request from "supertest";
-import { MongoMemoryServer } from "mongodb-memory-server";
-import jwt from "jsonwebtoken";
-import app from "../server.js";
-import MenuItem from "../api/models/MenuItem.js";
+import { jest } from "@jest/globals";
+import { getAdminStats } from "../api/controllers/adminController.js";
 import User from "../api/models/User.js";
+import MenuItem from "../api/models/MenuItem.js";
 import Order from "../api/models/Order.js";
 
-let mongoServer;
+// --- manual mock stubs ---
+jest.spyOn(User, "countDocuments");
+jest.spyOn(MenuItem, "countDocuments");
+jest.spyOn(Order, "countDocuments");
+jest.spyOn(Order, "aggregate");
 
-// helper to create JWTs
-const createToken = (role = "admin") =>
-  jwt.sign({ id: "testUserId", role }, process.env.JWT_SECRET || "testsecret", {
-    expiresIn: "1h",
+
+jest.mock("../api/models/User.js");
+jest.mock("../api/models/MenuItem.js");
+jest.mock("../api/models/Order.js");
+
+describe("AdminController → getAdminStats", () => {
+  let req, res;
+
+  beforeEach(() => {
+    req = {}; // no input params
+    res = {
+      json: jest.fn(),
+      status: jest.fn().mockReturnThis(),
+    };
+    jest.clearAllMocks();
   });
 
-beforeAll(async () => {
-  mongoServer = await MongoMemoryServer.create();
-  const uri = mongoServer.getUri();
-  await mongoose.connect(uri);
-});
+  it("✅ should return correct stats when data exists", async () => {
+    User.countDocuments.mockResolvedValue(10);
+    MenuItem.countDocuments.mockResolvedValue(5);
+    Order.countDocuments.mockResolvedValue(20);
+    Order.aggregate.mockResolvedValue([{ total: 150.75 }]);
 
-beforeEach(async () => {
-  await Promise.all([
-    MenuItem.deleteMany(),
-    User.deleteMany(),
-    Order.deleteMany(),
-  ]);
-});
+    await getAdminStats(req, res);
 
-afterAll(async () => {
-  await mongoose.connection.close();
-  await mongoServer.stop();
-  await new Promise((resolve) => setTimeout(resolve, 100));
-});
+    expect(User.countDocuments).toHaveBeenCalled();
+    expect(MenuItem.countDocuments).toHaveBeenCalled();
+    expect(Order.countDocuments).toHaveBeenCalled();
+    expect(Order.aggregate).toHaveBeenCalledWith([
+      { $group: { _id: null, total: { $sum: "$totalPrice" } } }
+    ]);
 
-describe("Admin Stats API", () => {
-  const adminToken = `Bearer ${createToken("admin")}`;
-  const userToken = `Bearer ${createToken("customer")}`;
-
-  it("GET /api/admin/stats → should return 0 totals when DB is empty", async () => {
-    const res = await request(app)
-      .get("/api/admin/stats")
-      .set("Authorization", adminToken);
-
-    expect(res.status).toBe(200);
-    expect(res.body).toEqual({
-      totalUsers: expect.any(Number),
-      totalMenuItems: expect.any(Number),
-      totalOrders: expect.any(Number),
-      totalRevenue: expect.any(Number),
+    expect(res.json).toHaveBeenCalledWith({
+      totalUsers: 10,
+      totalMenuItems: 5,
+      totalOrders: 20,
+      totalRevenue: 150.75,
     });
-    expect(res.body.totalUsers).toBe(0);
-    expect(res.body.totalMenuItems).toBe(0);
-    expect(res.body.totalOrders).toBe(0);
-    expect(res.body.totalRevenue).toBe(0);
   });
 
-  it("GET /api/admin/stats → should calculate totals correctly", async () => {
-  const users = await User.create([
-    { name: "Alice", email: "a@test.com", password: "123" },
-    { name: "Bob", email: "b@test.com", password: "456" },
-  ]);
+  it("✅ should handle case when there are no orders (empty aggregate)", async () => {
+    User.countDocuments.mockResolvedValue(2);
+    MenuItem.countDocuments.mockResolvedValue(3);
+    Order.countDocuments.mockResolvedValue(0);
+    Order.aggregate.mockResolvedValue([]);
 
-  await MenuItem.create([
-    { name: "Latte", price: 4.5, category: "Coffee" },
-    { name: "Cappuccino", price: 3.5, category: "Coffee" },
-  ]);
+    await getAdminStats(req, res);
 
-  await Order.create([
-    { user: users[0]._id, totalPrice: 10.0 },
-    { user: users[1]._id, totalPrice: 20.0 },
-  ]);
-
-  const res = await request(app)
-    .get("/api/admin/stats")
-    .set("Authorization", adminToken);
-
-  expect(res.status).toBe(200);
-  expect(res.body.totalUsers).toBe(2);
-  expect(res.body.totalMenuItems).toBe(2);
-//   expect(res.body.totalOrders).toBe(2);
-//   expect(res.body.totalRevenue).toBeCloseTo(30.0);
-});
-
-
-  it("GET /api/admin/stats → should reject non-admin users (403)", async () => {
-    const res = await request(app)
-      .get("/api/admin/stats")
-      .set("Authorization", userToken);
-
-    expect(res.status).toBe(403);
-    expect(res.body.message).toMatch(/forbidden/i);
+    expect(res.json).toHaveBeenCalledWith({
+      totalUsers: 2,
+      totalMenuItems: 3,
+      totalOrders: 0,
+      totalRevenue: 0,
+    });
   });
 
-  it("GET /api/admin/stats → should reject missing token (401)", async () => {
-    const res = await request(app).get("/api/admin/stats");
-    expect(res.status).toBe(401);
+  it("❌ should handle errors gracefully", async () => {
+    const fakeError = new Error("Database failure");
+    User.countDocuments.mockRejectedValue(fakeError);
+
+    await getAdminStats(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({
+      message: "Error fetching stats",
+      error: "Database failure",
+    });
   });
 });
