@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../api/axios";
 import { useCart } from "../context/CartContext";
 import MenuItemCard from "../components/MenuItemCard";
 
@@ -9,11 +9,18 @@ export default function Menu() {
   const { addToCart } = useCart();
 
   useEffect(() => {
-    axios
-      .get("/api/menu")
-      .then((res) => setMenu(res.data))
-      .catch((err) => console.error("❌ Failed to load menu:", err))
-      .finally(() => setLoading(false));
+    const fetchMenu = async () => {
+      try {
+        const res = await api.get("/menu");
+        setMenu(res.data || []);
+      } catch (err) {
+        console.error("❌ Failed to load menu:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMenu();
   }, []);
 
   if (loading)
@@ -34,9 +41,12 @@ export default function Menu() {
   return (
     <div className="bg-white p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
       {menu.map((item) => (
-        <MenuItemCard key={item._id || item.id} item={item} onAdd={() => addToCart(item)} />
+        <MenuItemCard
+          key={item._id || item.id}
+          item={item}
+          onAdd={() => addToCart(item)}
+        />
       ))}
     </div>
-    
   );
 }
