@@ -7,7 +7,8 @@
     "react/react-in-jsx-scope": "off",
     "react/prop-types": "off",
     "no-unused-vars": "warn",
-    "no-console": "off"
+    "no-console": "off",
+    "quotes": "off"        // ⬅️ Added this line
   },
   "ignorePatterns": ["dist/", "node_modules/"]
 }
