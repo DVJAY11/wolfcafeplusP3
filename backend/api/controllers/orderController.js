@@ -50,21 +50,28 @@ export const updateOrderStatus = async (req, res) => {
 
     if (!order) return res.status(404).json({ message: "Order not found" });
 
-    // ✅ If order becomes "ready", notify user by email + socket
-    if (status === "ready" && order.user?.email) {
-      await sendEmail(
-        order.user.email,
-        "Your WolfCafe+ Order is Ready for Pickup ☕",
-        `Hi ${order.user.name || "there"},\n\nYour order #${order._id} is ready for pickup!\n\nSee you soon at WolfCafe+.\n\n– WolfCafe+ Team`
-      );
-
-      io.to(order.user._id.toString()).emit("order_ready", {
-        orderId: order._id,
-        message: "Your order is ready for pickup!",
-      });
-    }
-
+    // Return response immediately (fast)
     res.status(200).json(order);
+
+    // Fire-and-forget: run email + socket after responding
+    if (status === "ready" && order.user?.email) {
+      (async () => {
+        try {
+          await sendEmail(
+            order.user.email,
+            "Your WolfCafe+ Order is Ready for Pickup ☕",
+            `Hi ${order.user.name || "there"},\n\nYour order #${order._id} is ready for pickup!\n\nSee you soon at WolfCafe+.\n\n– WolfCafe+ Team`
+          );
+
+          io.to(order.user._id.toString()).emit("order_ready", {
+            orderId: order._id,
+            message: "Your order is ready for pickup!",
+          });
+        } catch (err) {
+          console.error("❌ Fire-and-forget error:", err);
+        }
+      })();
+    }
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
