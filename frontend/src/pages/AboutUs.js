@@ -131,9 +131,9 @@ export default function About() {
           </p>
           <div className="grid sm:grid-cols-3 gap-8">
             {[
-              { name: "Dhruva Kamble", github: "DhruvaKamble" },
+              { name: "Dhruva Kamble", github: "Dhruva0101" },
               { name: "Rishitha Ramesh", github: "RishithaRamesh" },
-              { name: "Rujuta Budke", github: "RujutaBudke" },
+              { name: "Rujuta Budke", github: "Rujuta13" },
             ].map((member) => (
               <div key={member.github} className="p-6 rounded-xl border hover:shadow-md transition">
                 <h3 className="font-semibold text-lg mb-2">{member.name}</h3>
