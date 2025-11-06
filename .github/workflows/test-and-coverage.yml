@@ -8,6 +8,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+
     steps:
       - name: 🧾 Checkout repository
         uses: actions/checkout@v4
@@ -27,4 +28,5 @@ jobs:
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          files: backend/coverage/lcov.info   # ✅ Explicit coverage file path
           fail_ci_if_error: true
