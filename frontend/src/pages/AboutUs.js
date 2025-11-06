@@ -33,7 +33,7 @@ export default function About() {
               cravings. We asked ourselves: <em>why can’t this be smarter?</em>
             </p>
             <p className="text-gray-700 leading-relaxed mt-3">
-              WrikiCafe+ was born out of this question — a project for CSC 326 that
+              WrikiCafe+ was born out of this question — a project for CSC 510 that
               evolved into a mission to make campus dining seamless, social, and
               intelligent. It’s more than a food-ordering system: it’s a re-imagined
               experience where every Wolfpack member feels connected.
