@@ -59,8 +59,8 @@ export const updateOrderStatus = async (req, res) => {
         try {
           await sendEmail(
             order.user.email,
-            "Your WrikiCafe Order is Ready for Pickup ☕",
-            `Hi ${order.user.name || "there"},\n\nYour order #${order._id} is ready for pickup!\n\nSee you soon at WrikiCafe.\n\n– WrikiCafe Team`
+            "Your WrikiCafe+ Order is Ready for Pickup ☕",
+            `Hi ${order.user.name || "there"},\n\nYour order #${order._id} is ready for pickup!\n\nSee you soon at WrikiCafe+.\n\n– WrikiCafe+ Team`
           );
 
           io.to(order.user._id.toString()).emit("order_ready", {

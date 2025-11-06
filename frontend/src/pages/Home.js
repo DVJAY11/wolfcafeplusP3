@@ -117,9 +117,9 @@ export default function Home() {
 
   {/* Footer */}
   <footer className="bg-black text-gray-300 py-10 text-center border-t border-gray-700">
-    <h4 className="text-xl font-semibold text-white mb-4">WrikiCafe</h4>
+    <h4 className="text-xl font-semibold text-white mb-4">WrikiCafe+</h4>
     <p className="text-gray-400 mb-3">
-      📞 (919) 123-4567 &nbsp; | &nbsp; ✉️ wolfcafe@ncsu.edu
+      📞 (919) 123-4567 &nbsp; | &nbsp; ✉️ wrikicafe@gmail.com
     </p>
 
   <div className="flex justify-center space-x-6 mt-4 text-2xl">
@@ -158,7 +158,7 @@ export default function Home() {
   </div>
 
   <p className="text-gray-500 text-sm mt-6">
-    © {new Date().getFullYear()} WrikiCafe. All rights reserved.
+    © {new Date().getFullYear()} WrikiCafe+. All rights reserved.
   </p>
 </footer>
 

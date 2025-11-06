@@ -1,0 +1,18 @@
+name: Weekly Backup Repository
+
+on:
+  schedule:
+    - cron: '0 3 * * 1'  # every Monday at 3 AM UTC
+  workflow_dispatch:       # allows manual run
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🧾 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🗄️ Backup to another repo
+        uses: spyoungtech/github-repo-backup@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}

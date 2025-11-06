@@ -12,7 +12,7 @@ export const sendEmail = async (to, subject, text) => {
     });
 
     const mailOptions = {
-      from: `"WrikiCafe" <${process.env.EMAIL_USER}>`,
+      from: `"WrikiCafe+" <${process.env.EMAIL_USER}>`,
       to,
       subject,
       text

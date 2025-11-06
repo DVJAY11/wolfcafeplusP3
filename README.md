@@ -10,7 +10,7 @@
 ![Node.js](https://img.shields.io/badge/Node.js-18%2B-43853D?logo=node.js&logoColor=white)
 ![License](https://img.shields.io/badge/License-ISC-blue)
 ![formatter](https://img.shields.io/badge/formatter-Prettier-ff69b4)
-> A smarter, personalized, and social campus food-ordering system for NC State University. || Funfact: WrikiCafe is derived from the Sanskrit word vṛkī (वृकी) meaning she-wolf ||
+> A smarter, personalized, and social campus food-ordering system for NC State University. || Funfact: WrikiCafe+ is derived from the Sanskrit word vṛkī (वृकी) meaning she-wolf ||
 
 ---
 

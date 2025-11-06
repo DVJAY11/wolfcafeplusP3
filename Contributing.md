@@ -1,3 +1,17 @@
+# 🤝 Contributing to WrikiCafe+
+
+Thank you for your interest in contributing to **WrikiCafe+**!  
+We welcome contributions of all kinds — from fixing bugs and improving documentation to adding new features.
+
+
+## 🪄 How to Contribute
+
+### 1. Fork & Clone the Repository
+```bash
+git clone https://github.com/RishithaRamesh/WolfCafePlus.git
+cd WolfCafePlus
+git checkout -b feature/your-feature-name
+
 # Contributing
 
 When contributing to this repository, please first discuss the change you wish to make via issue,

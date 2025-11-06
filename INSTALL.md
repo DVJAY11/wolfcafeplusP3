@@ -10,7 +10,7 @@ npm start
 
 ### 1. Prepare the Project
 Ensure the repository follows this structure:
-wrikicafe/
+WrikiCafe/
 ├── backend/
 │ ├── server.js
 │ ├── package.json
@@ -39,7 +39,7 @@ Add environment variables:
 MONGODB_URI = your_mongo_connection_string
 NODE_ENV = production
 Click Deploy.
-Render will host your backend API (e.g., https://wrikicafe-backend.onrender.com).
+Render will host your backend API (e.g., https://WrikiCafe-backend.onrender.com).
 
 ### Deploy the Frontend on Render
 Click “New → Static Site.”
@@ -52,9 +52,9 @@ Publish Directory: dist/
 Add an environment variable:
 
 
-VITE_API_BASE_URL = https://wrikicafe-backend.onrender.com/api
+VITE_API_BASE_URL = https://WrikiCafe-backend.onrender.com/api
 Click Deploy.
-Your frontend will be available at https://wrikicafe.onrender.com.
+Your frontend will be available at https://WrikiCafe.onrender.com.
 
 ### Connect Frontend and Backend
 Update src/api/axios.js (or equivalent):

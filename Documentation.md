@@ -1,10 +1,10 @@
-# ☕ wrikicafe Documentation
+# ☕ WrikiCafe+ Documentation
 
 ## Quickstart
 Follow INSTALL.md
 
 ## 1. Overview
-**wrikicafe** is a modern, MERN-stack (MongoDB, Express, React, Node.js) web application designed to simplify and enhance campus café experiences.  
+**WrikiCafe+** is a modern, MERN-stack (MongoDB, Express, React, Node.js) web application designed to simplify and enhance campus café experiences.  
 It enables users to browse menus, place and track orders, and experience smart personalization — all within a clean, aesthetic interface.  
 Administrators can manage and monitor orders through a dedicated dashboard, monitor orders in real time, update order status (Pending → In Progress → Ready → Completed), curate menu items, and send real-time instant notifications to customers.
 
@@ -54,12 +54,12 @@ Administrators can manage and monitor orders through a dedicated dashboard, moni
 ---
 
 ## 6. References & Links
-- 🌐 **Live Demo:** [https://wrikicafe.onrender.com/](https://wrikicafe.onrender.com/)  
+- 🌐 **Live Demo:** [https://WrikiCafe.onrender.com/](https://WrikiCafe.onrender.com/)  
 - 🧠 **GitHub Repository:** [https://github.com/RishithaRamesh/WolfCafePlus](https://github.com/RishithaRamesh/WolfCafePlus)  
 - 📄 **Documentation:** Included in `README.md` and `DOCUMENTATION.md`  
 - 🎥 **Demo Video:** 
 
 ---
 
-> 🩵 wrikicafe — “Order Smarter, Eat Faster.”  
+> 🩵 WrikiCafe+ — “Order Smarter, Eat Faster.”  
 > Built by **Rishitha Ramesh, Rujuta Budke, and Dhruva Kamble**

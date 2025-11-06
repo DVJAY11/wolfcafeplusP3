@@ -61,12 +61,12 @@ export default function Navbar() {
         <Link to="/" className="flex items-center space-x-3">
           <img
             src="/logo.png"
-            alt="WolfCafe Logo"
+            alt="WrikiCafe Logo"
             className="h-16 w-16 object-contain"
             style={{ marginRight: "0.05rem" }}
           />
           <span className="text-4xl tracking-widest font-bold">
-            <span style={{ fontFamily: "'Anton', sans-serif" }} className="text-white">WOLF</span>
+            <span style={{ fontFamily: "'Anton', sans-serif" }} className="text-white">WRIKI</span>
             <span style={{ fontFamily: "'Playfair Display', serif" }} className="text-red-600 ml-1">CAFE+</span>
           </span>
         </Link>

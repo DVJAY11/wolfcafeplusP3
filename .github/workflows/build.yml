@@ -36,4 +36,4 @@ jobs:
 
       # ---------- FINISH ----------
       - name: ✅ Build verification complete
-        run: echo "✅ wrikicafe build and test workflow completed successfully."
+        run: echo "✅ WrikiCafe+ build and test workflow completed successfully."
