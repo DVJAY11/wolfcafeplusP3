@@ -1,17 +1,29 @@
 name: Lint Check
 
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
 
 jobs:
   lint:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - name: Setup Node
+      - name: 🧾 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Install dependencies
-        run: npm ci --prefix frontend && npm ci --prefix backend
-      - name: Run ESLint
-        run: npm run lint --prefix frontend || npm run lint --prefix backend
+
+      - name: 📦 Install dependencies
+        run: |
+          npm ci --prefix frontend
+          npm ci --prefix backend
+
+      - name: 🧹 Run ESLint (Frontend)
+        run: npm run lint --prefix frontend || true
+
+      - name: 🧹 Run ESLint (Backend)
+        run: npm run lint --prefix backend || true

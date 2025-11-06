@@ -13,7 +13,7 @@ describe("🧩 baseController → getStatus", () => {
   it("should return a 200 response with correct message", async () => {
     const res = await request(app).get("/status");
     expect(res.status).toBe(200);
-    expect(res.body).toEqual({ message: "☕ WolfCafe+ backend running..." });
+    expect(res.body).toEqual({ message: "☕ WrikiCafe backend running..." });
   });
 
   it("should respond with JSON format", async () => {
