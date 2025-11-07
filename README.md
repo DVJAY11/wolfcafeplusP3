@@ -31,11 +31,10 @@ _Showing new functionality: role-based permissions, order tracking, and real-tim
 ## 🚀 Project Overview
 **WrikiCafe+** is a full-stack MERN (MongoDB, Express, React, Node.js) web application designed to modernize and simplify campus café operations. Our mission is to make campus dining **smarter, faster, and more personalized** — for students, staff, and administrators alike.
 
-| Role | Capabilities |
-|------|---------------|
-| **Admin** | Manages menu inventory | tracks all orders | set tax rate | Live Analytics Dashboard | 
-            | Updates order statuses in real time |  pickup workflow |
-| **Customer** | Browse menu, add to cart, checkout, receive pickup alerts |
+| **Role** | **Capabilities** |
+|-----------|------------------|
+| 🧑‍💼 **Admin** | • Manage menu inventory<br>• Track all orders<br>• Set tax rates<br>• Access live analytics dashboard<br>• Update order statuses in real time<br>• Oversee pickup workflow |
+| 🧑‍🎓 **Customer** | • Browse menu<br>• Add items to cart<br>• Checkout securely<br>• Receive email alerts when orders are ready |
 
 
 ## 🧩 Key Features (v1)
