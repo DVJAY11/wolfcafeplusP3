@@ -12,24 +12,26 @@ export const CartProvider = ({ children }) => {
   const { showLoginModal } = useModal();
 
   // Fetch cart when user logs in
+  const fetchCart = async () => {
+    if (!user) {
+      setCart([]); // clear cart on logout
+      return;
+    }
+    try {
+      const res = await api.get("/cart");
+      // backend returns { cart: {...} }
+      setCart(res.data.cart?.items || []);
+    } catch (err) {
+      console.error("Failed to fetch cart:", err);
+    }
+  };
+
+  // Load cart when user logs in
   useEffect(() => {
-    const fetchCart = async () => {
-      if (!user) {
-        setCart([]); // clear cart on logout
-        return;
-      }
-      try {
-        const res = await api.get("/cart");
-        // backend returns { cart: {...} }
-        setCart(res.data.cart?.items || []);
-      } catch (err) {
-        console.error("Failed to fetch cart:", err);
-      }
-    };
     fetchCart();
   }, [user]);
 
-  // Update cart on backend (+1, -1, etc.)
+  // Update cart item quantity
   const updateCartItem = async (item, change = 1) => {
     if (!user) {
       showLoginModal();
@@ -79,6 +81,7 @@ export const CartProvider = ({ children }) => {
         decrementItem,
         removeFromCart,
         clearCart,
+        fetchCart,
       }}
     >
       {children}
