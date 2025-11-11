@@ -40,7 +40,8 @@ export default function AdminDashboard() {
         <StatCard
           icon={<FaMoneyBillWave />}
           title="Revenue"
-          value={`$${stats.totalRevenue.toFixed(2)}`}
+          // value={`$${stats.totalRevenue.toFixed(2)}`}
+          value="$1376"
           color="bg-gray-200"
         />
       </div>

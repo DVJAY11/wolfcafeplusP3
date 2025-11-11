@@ -1,13 +1,12 @@
-// export default function ManageItems() {
-//   return <h1 className="text-2xl font-bold text-red-700">Manage Items (Coming soon)</h1>;
-// }
 import React, { useEffect, useState } from "react";
 import api from "../../api/axios";
+import { useCart } from "../../context/CartContext";
 
 export default function ManageItems() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const { fetchCart } = useCart();
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -35,7 +34,9 @@ export default function ManageItems() {
           item._id === id ? { ...item, available: res.data.item.available } : item
         )
       );
-    } catch {
+      await fetchCart();
+    } catch (err) {
+      console.error("Error updating item availability:", err);
       alert("Error updating item availability");
     }
   };
