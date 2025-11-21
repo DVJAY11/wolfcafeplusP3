@@ -17,11 +17,12 @@ beforeAll(async () => {
   process.env.JWT_SECRET = "testsecret"; // for consistent JWT signing
   mongoServer = await MongoMemoryServer.create();
   await mongoose.connect(mongoServer.getUri(), { dbName: "testDB" });
-});
+}, 60000); // Increased timeout for slow Windows binary download
 
 afterAll(async () => {
-  await mongoose.disconnect();
+  await mongoose.connection.close();
   await mongoServer.stop();
+  await new Promise(resolve => setTimeout(resolve, 100));
 });
 
 afterEach(async () => {
@@ -74,28 +75,28 @@ describe("🧑‍💻 Auth Controller", () => {
 
   describe("POST /api/auth/login → login()", () => {
     it("✅ should login successfully and return a token", async () => {
-        const user = await User.create({
-            name: "Bob",
-            email: "bob@example.com",
-            password: "secret", // plain, model will hash it
-            role: "customer",
-        });
+      const user = await User.create({
+        name: "Bob",
+        email: "bob@example.com",
+        password: "secret", // plain, model will hash it
+        role: "customer",
+      });
 
-        const req = { body: { email: "bob@example.com", password: "secret" } };
-        const res = mockRes();
+      const req = { body: { email: "bob@example.com", password: "secret" } };
+      const res = mockRes();
 
-        const tokenSpy = jest.spyOn(jwt, "sign").mockReturnValue("testtoken");
+      const tokenSpy = jest.spyOn(jwt, "sign").mockReturnValue("testtoken");
 
-        await login(req, res);
+      await login(req, res);
 
-        expect(res.json).toHaveBeenCalledWith(
-            expect.objectContaining({
-            token: "testtoken",
-            user: expect.objectContaining({ name: "Bob", role: "customer" }),
-            })
-        );
-        expect(tokenSpy).toHaveBeenCalled();
-        });
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          token: "testtoken",
+          user: expect.objectContaining({ name: "Bob", role: "customer" }),
+        })
+      );
+      expect(tokenSpy).toHaveBeenCalled();
+    });
 
     it("🚫 should return 404 for invalid email", async () => {
       const req = { body: { email: "missing@example.com", password: "secret" } };
