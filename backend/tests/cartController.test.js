@@ -12,11 +12,12 @@ let userCartMap = new Map();
 beforeAll(async () => {
   mongoServer = await MongoMemoryServer.create();
   await mongoose.connect(mongoServer.getUri(), { dbName: "testDB" });
-});
+}, 30000);
 
 afterAll(async () => {
-  await mongoose.disconnect();
+  await mongoose.connection.close();
   await mongoServer.stop();
+  await new Promise(resolve => setTimeout(resolve, 100));
 });
 
 afterEach(async () => {
@@ -93,7 +94,7 @@ describe("🛒 Cart Controller", () => {
       expect(res.status).toHaveBeenCalledWith(404);
     });
   });
-  
+
   /*
   describe("GET /api/cart → getCart()", () => {
     it("✅ should return empty cart message when no cart exists", async () => {
