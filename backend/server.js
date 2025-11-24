@@ -12,6 +12,7 @@ import menuRoutes from "./api/routes/menuRoutes.js";
 import cartRoutes from "./api/routes/cartRoutes.js";
 import orderRoutes from "./api/routes/orderRoutes.js";
 import adminRoutes from "./api/routes/adminRoutes.js";
+import recommendationRoutes from "./api/routes/recommendationRoutes.js";
 
 dotenv.config();
 
@@ -48,6 +49,7 @@ app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/recommend", recommendationRoutes);
 
 // Protected route example
 app.get("/api/admin", verifyToken, allowRoles("admin"), (req, res) => {

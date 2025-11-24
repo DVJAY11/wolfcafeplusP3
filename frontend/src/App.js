@@ -4,8 +4,9 @@ import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import Menu from "./pages/Menu";
 import Cart from "./pages/Cart";
-import AboutUs from "./pages/AboutUs"; 
+import AboutUs from "./pages/AboutUs";
 import Login from "./pages/Login";
+import SmartOrder from "./pages/SmartOrder";
 import { CartProvider } from "./context/CartContext";
 import AuthProvider from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -22,7 +23,7 @@ function PageWrapper({ children }) {
   const location = useLocation();
   const isHome = location.pathname === "/"; // only homepage stays transparent
 
-  return <div className={isHome ? "" : "pt-24"}>{children}</div>;
+  return <div className={ isHome ? "" : "pt-24" }>{ children }</div>;
 }
 
 function App() {
@@ -32,30 +33,31 @@ function App() {
         <CartProvider>
           <Router>
             <PageWrapper>
-            <Navbar />
-            <Routes>
-              {/* 🌐 Public routes */}
-              <Route path="/" element={<Home />} />
-              <Route path="/menu" element={<Menu />} />
-              <Route path="/cart" element={<Cart />} />
-              <Route path="/about" element={<AboutUs />} />
-              <Route path="/login" element={<Login />} />
+              <Navbar />
+              <Routes>
+                {/* 🌐 Public routes */ }
+                <Route path="/" element={ <Home /> } />
+                <Route path="/menu" element={ <Menu /> } />
+                <Route path="/cart" element={ <Cart /> } />
+                <Route path="/about" element={ <AboutUs /> } />
+                <Route path="/login" element={ <Login /> } />
+                <Route path="/smart-order" element={ <SmartOrder /> } />
 
-              {/* 🔒 Authenticated (non-admin) protected routes */}
-              <Route element={<ProtectedRoute />}>
-              {/* example placeholder; you can add user-only routes here */}
-              {/* <Route path="/profile" element={<UserProfile />} /> */}
-            </Route>
-
-              {/* 🧑‍💼 Admin-only protected routes */}
-              <Route element={<AdminProtectedRoute />}>
-              <Route path="/admin" element={<AdminLayout />}>
-                  <Route index element={<AdminDashboard />} />
-                  <Route path="orders" element={<ManageOrders />} />
-                  <Route path="items" element={<ManageItems />} />
+                {/* 🔒 Authenticated (non-admin) protected routes */ }
+                <Route element={ <ProtectedRoute /> }>
+                  {/* example placeholder; you can add user-only routes here */ }
+                  {/* <Route path="/profile" element={<UserProfile />} /> */ }
                 </Route>
-            </Route>
-            </Routes>
+
+                {/* 🧑‍💼 Admin-only protected routes */ }
+                <Route element={ <AdminProtectedRoute /> }>
+                  <Route path="/admin" element={ <AdminLayout /> }>
+                    <Route index element={ <AdminDashboard /> } />
+                    <Route path="orders" element={ <ManageOrders /> } />
+                    <Route path="items" element={ <ManageItems /> } />
+                  </Route>
+                </Route>
+              </Routes>
             </PageWrapper>
           </Router>
         </CartProvider>
