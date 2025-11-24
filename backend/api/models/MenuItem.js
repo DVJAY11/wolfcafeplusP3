@@ -6,6 +6,7 @@ const menuItemSchema = new mongoose.Schema(
     description: String,
     price: { type: Number, required: true },
     category: String,
+    itemGroup: { type: String, enum: ["drink", "main", "side", "other"], default: "other" },
     image: String,
     available: { type: Boolean, default: true }
   },
