@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink, Outlet } from "react-router-dom";
-import { FaTachometerAlt, FaClipboardList, FaUtensils, FaHome } from "react-icons/fa";
+import { FaTachometerAlt, FaClipboardList, FaUtensils, FaHome, FaSeedling } from "react-icons/fa";
 
 export default function AdminLayout() {
   const navLinkClass = ({ isActive }) =>
@@ -9,20 +9,23 @@ export default function AdminLayout() {
 
   return (
     <div className="flex min-h-screen">
-      {/* Sidebar */}
+      {/* Sidebar */ }
       <aside className="w-64 bg-white shadow-md flex flex-col justify-between">
         <div className="p-6">
           <nav className="flex flex-col gap-2">
-            <NavLink to="/admin" end className={navLinkClass}>
+            <NavLink to="/admin" end className={ navLinkClass }>
               <FaTachometerAlt /> Dashboard
             </NavLink>
-            <NavLink to="/admin/orders" className={navLinkClass}>
+            <NavLink to="/admin/orders" className={ navLinkClass }>
               <FaClipboardList /> Manage Orders
             </NavLink>
-            <NavLink to="/admin/items" className={navLinkClass}>
+            <NavLink to="/admin/items" className={ navLinkClass }>
               <FaUtensils /> Manage Items
             </NavLink>
-            <NavLink to="/" className={navLinkClass}>
+            <NavLink to="/admin/ingredients" className={ navLinkClass }>
+              <FaSeedling /> Manage Ingredients
+            </NavLink>
+            <NavLink to="/" className={ navLinkClass }>
               <FaHome /> Back to Home
             </NavLink>
           </nav>
@@ -33,9 +36,9 @@ export default function AdminLayout() {
         </div>
       </aside>
 
-      {/* Main content area */}
+      {/* Main content area */ }
       <main className="flex-1 p-8 bg-gray-50 overflow-y-auto">
-        <Outlet /> {/* renders child pages here */}
+        <Outlet /> {/* renders child pages here */ }
       </main>
     </div>
   );
