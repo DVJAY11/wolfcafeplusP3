@@ -83,11 +83,16 @@ describe("Menu API", () => {
       available: true,
     });
 
+    const userId1 = new mongoose.Types.ObjectId();
+    const userId2 = new mongoose.Types.ObjectId();
+
     // 2️⃣ Create two carts that contain that menu item
     await Cart.create({
+      user: userId1,
       items: [{ menuItem: item._id, quantity: 1 }],
     });
     await Cart.create({
+      user: userId2,
       items: [{ menuItem: item._id, quantity: 2 }],
     });
 
@@ -117,8 +122,10 @@ describe("Menu API", () => {
       available: false,
     });
 
+    const userId = new mongoose.Types.ObjectId();
+
     // 2️⃣ Create a cart that currently has *no* items
-    const emptyCart = await Cart.create({ items: [] });
+    const emptyCart = await Cart.create({ user: userId, items: [] });
 
     // 3️⃣ Try restoring the item
     const res = await request(app).patch(`/api/menu/${item._id}/restore`);
