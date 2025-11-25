@@ -1,5 +1,10 @@
 import MenuItem from "../models/MenuItem.js";
 import Order from "../models/Order.js";
+import {
+	getHybridRecommendations,
+	getSimilarItems,
+	buildUserProfile,
+} from "../services/recommendationService.js";
 
 // GET /api/recommend/smart-suggestions
 export const getSmartSuggestions = async (req, res) => {
@@ -87,3 +92,112 @@ export const getSmartSuggestions = async (req, res) => {
 		res.status(500).json({ message: err.message });
 	}
 };
+
+// GET /api/recommend/personalized
+// ML-powered personalized recommendations
+export const getPersonalizedRecommendations = async (req, res) => {
+	try {
+		const userId = req.user?.id;
+
+		if (!userId) {
+			return res.status(401).json({ message: "User not authenticated" });
+		}
+
+		const { budget, timeAvailable, limit } = req.query;
+
+		// Validate query parameters
+		if (!budget || !timeAvailable) {
+			return res.status(400).json({
+				message: "Both budget and timeAvailable parameters are required"
+			});
+		}
+
+		const budgetNum = parseFloat(budget);
+		const timeNum = parseInt(timeAvailable);
+		const limitNum = limit ? parseInt(limit) : 10;
+
+		if (isNaN(budgetNum) || budgetNum <= 0) {
+			return res.status(400).json({ message: "Budget must be a positive number" });
+		}
+
+		if (isNaN(timeNum) || timeNum <= 0) {
+			return res.status(400).json({ message: "Time available must be a positive number" });
+		}
+
+		// Get hybrid ML recommendations
+		const recommendations = await getHybridRecommendations(
+			userId,
+			budgetNum,
+			timeNum,
+			limitNum
+		);
+
+		res.status(200).json({
+			count: recommendations.length,
+			budget: budgetNum,
+			timeAvailable: timeNum,
+			userId,
+			recommendations,
+		});
+	} catch (err) {
+		console.error("Error in getPersonalizedRecommendations:", err);
+		res.status(500).json({ message: err.message });
+	}
+};
+
+// GET /api/recommend/similar-items/:itemId
+// Find items similar to a given item
+export const getSimilarItemsController = async (req, res) => {
+	try {
+		const { itemId } = req.params;
+		const { limit } = req.query;
+
+		if (!itemId) {
+			return res.status(400).json({ message: "Item ID is required" });
+		}
+
+		const limitNum = limit ? parseInt(limit) : 5;
+
+		const similarItems = await getSimilarItems(itemId, limitNum);
+
+		res.status(200).json({
+			count: similarItems.length,
+			itemId,
+			similarItems,
+		});
+	} catch (err) {
+		console.error("Error in getSimilarItemsController:", err);
+		res.status(500).json({ message: err.message });
+	}
+};
+
+// POST /api/recommend/update-preferences
+// Manually trigger user preference profile update
+export const updateUserPreferences = async (req, res) => {
+	try {
+		const userId = req.user?.id;
+
+		if (!userId) {
+			return res.status(401).json({ message: "User not authenticated" });
+		}
+
+		// Build/update user profile
+		const preferences = await buildUserProfile(userId);
+
+		if (!preferences) {
+			return res.status(200).json({
+				message: "No order history found. Preferences will be built after first order.",
+				preferences: null,
+			});
+		}
+
+		res.status(200).json({
+			message: "User preferences updated successfully",
+			preferences,
+		});
+	} catch (err) {
+		console.error("Error in updateUserPreferences:", err);
+		res.status(500).json({ message: err.message });
+	}
+};
+
