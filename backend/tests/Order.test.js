@@ -30,11 +30,17 @@ describe("🧾 Order Model (commented for connection issues)", () => {
     const order = new Order({
       user: mockUserId,
       items: [{ menuItem: mockMenuItemId, quantity: 2 }],
+      subtotal: 10.00,
+      tip: 1.50,
+      total: 11.50,
     });
 
     // just check structure, no DB
     expect(order.user).toBeDefined();
     expect(order.items[0].menuItem).toBeDefined();
+    expect(order.subtotal).toBe(10.00);
+    expect(order.tip).toBe(1.50);
+    expect(order.total).toBe(11.50);
     expect(order.status).toBe("pending");
   });
 
