@@ -16,7 +16,7 @@ import ingredientRoutes from "./api/routes/ingredientRoutes.js";
 import customItemRoutes from "./api/routes/customItemRoutes.js";
 
 dotenv.config();
-
+console.log("MONGO_URI from .env:", process.env.MONGO_URI);
 const app = express();
 app.use(express.json());
 
