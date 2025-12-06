@@ -75,6 +75,7 @@ export default function Navbar() {
           <Link to="/" className="hover:text-red-500 transition">Home</Link>
           <Link to="/menu" className="hover:text-red-500 transition">Menu</Link>
           <Link to="/build-your-own" className="hover:text-red-500 transition">Build Your Own 🛠️</Link>
+          <Link to="/group-order" className="hover:text-red-500 transition">Group Order 👥</Link>
           <Link to="/about" className="hover:text-red-600">About Us</Link>
 
           {/* Cart Badge Updated Dynamically */ }

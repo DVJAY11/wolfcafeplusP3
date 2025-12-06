@@ -1,8 +1,17 @@
 import React from "react";
 import { useCart } from "../context/CartContext";
+import { useGroupOrder } from "../context/GroupOrderContext"; // ⭐ MUST be here
 
 export default function MenuItemCard({ item }) {
   const { cart, addToCart, incrementItem, decrementItem } = useCart();
+
+  // ✅ use the same name as in Menu.js: { groupOrder }
+  const { groupOrder, addItemToGroupOrder } = useGroupOrder();
+
+  console.log("MenuItemCard groupOrder =", groupOrder); // temporary debug
+
+  // ✅ we are inside an open group order if groupOrder exists and is 'open'
+  const inOpenGroup = !!groupOrder && groupOrder.status === "open";
 
   // find this item in cart (handle both populated and plain cart)
   const existing = cart.find(
@@ -12,9 +21,9 @@ export default function MenuItemCard({ item }) {
   );
 
   // handle both 'quantity' (backend) and 'qty' (local)
-  const qty = existing ? existing.quantity || existing.qty : 0;
+  // 👉 when in a group order, we ignore cart quantity (we show "Add to Group Order")
+  const qty = inOpenGroup ? 0 : (existing ? existing.quantity || existing.qty : 0);
 
-  // convenience helpers
   const handleIncrement = () => incrementItem(item);
   const handleDecrement = () => {
     if (qty > 0) decrementItem(item);
@@ -33,7 +42,9 @@ export default function MenuItemCard({ item }) {
       </h3>
 
       {item.description && (
-        <p className="text-sm text-gray-600 line-clamp-2">{item.description}</p>
+        <p className="text-sm text-gray-600 line-clamp-2">
+          {item.description}
+        </p>
       )}
 
       <p className="mt-auto text-md font-medium text-gray-700 mb-3">
@@ -55,7 +66,9 @@ export default function MenuItemCard({ item }) {
               −
             </button>
 
-            <span className="text-lg font-semibold text-gray-800">{qty}</span>
+            <span className="text-lg font-semibold text-gray-800">
+              {qty}
+            </span>
 
             <button
               onClick={handleIncrement}
@@ -66,10 +79,18 @@ export default function MenuItemCard({ item }) {
           </>
         ) : (
           <button
-            onClick={() => addToCart(item)}
+            onClick={() => {
+              if (inOpenGroup) {
+                // ⭐ group-order path
+                addItemToGroupOrder(item._id, 1, []);
+              } else {
+                // normal cart
+                addToCart(item);
+              }
+            }}
             className="bg-red-700 hover:bg-red-800 text-white font-medium px-6 py-2 rounded-xl transition"
           >
-            Add to Cart
+            {inOpenGroup ? "Add to Group Order" : "Add to Cart"}
           </button>
         )}
       </div>
