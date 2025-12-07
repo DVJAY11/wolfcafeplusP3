@@ -25,7 +25,6 @@ const allowedOrigins = [
   "https://wrikicafe-vqm0.onrender.com", // deployed frontend
   "https://wrikicafe.onrender.com",
   "http://localhost:3000",
-  "http://localhost:3001"                // local dev
 ];
 
 app.use(
