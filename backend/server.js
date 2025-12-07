@@ -24,7 +24,8 @@ app.use(express.json());
 const allowedOrigins = [
   "https://wrikicafe-vqm0.onrender.com", // deployed frontend
   "https://wrikicafe.onrender.com",
-  "http://localhost:3000"                // local dev
+  "http://localhost:3000",
+  "http://localhost:3001"                // local dev
 ];
 
 app.use(
@@ -73,7 +74,7 @@ io.on("connection", (socket) => {
 });
 
 // ---------- START SERVER ----------
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8000;
 
 if (process.env.NODE_ENV !== "test") {
   server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
