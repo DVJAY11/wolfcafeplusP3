@@ -17,6 +17,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import ManageOrders from "./pages/admin/ManageOrders";
 import ManageItems from "./pages/admin/ManageItems";
 import ManageIngredients from "./pages/admin/ManageIngredients";
+import AdminSalesStats from "./pages/admin/AdminSalesStats";
 import { ModalProvider } from "./context/ModalContext";
 
 // ✅ Wrapper to handle conditional padding
@@ -25,7 +26,7 @@ function PageWrapper({ children }) {
   const isHome = location.pathname === "/";
   const isBuildYourOwn = location.pathname === "/build-your-own";
 
-  return <div className={ isHome || isBuildYourOwn ? "" : "pt-24" }>{ children }</div>;
+  return <div className={isHome || isBuildYourOwn ? "" : "pt-24"}>{children}</div>;
 }
 
 function App() {
@@ -37,27 +38,28 @@ function App() {
             <PageWrapper>
               <Navbar />
               <Routes>
-                {/* 🌐 Public routes */ }
-                <Route path="/" element={ <Home /> } />
-                <Route path="/menu" element={ <Menu /> } />
-                <Route path="/cart" element={ <Cart /> } />
-                <Route path="/about" element={ <AboutUs /> } />
-                <Route path="/login" element={ <Login /> } />
-                <Route path="/build-your-own" element={ <BuildYourOwn /> } />
+                {/* 🌐 Public routes */}
+                <Route path="/" element={<Home />} />
+                <Route path="/menu" element={<Menu />} />
+                <Route path="/cart" element={<Cart />} />
+                <Route path="/about" element={<AboutUs />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/build-your-own" element={<BuildYourOwn />} />
 
-                {/* 🔒 Authenticated (non-admin) protected routes */ }
-                <Route element={ <ProtectedRoute /> }>
-                  {/* example placeholder; you can add user-only routes here */ }
-                  {/* <Route path="/profile" element={<UserProfile />} /> */ }
+                {/* 🔒 Authenticated (non-admin) protected routes */}
+                <Route element={<ProtectedRoute />}>
+                  {/* example placeholder; you can add user-only routes here */}
+                  {/* <Route path="/profile" element={<UserProfile />} /> */}
                 </Route>
 
-                {/* 🧑‍💼 Admin-only protected routes */ }
-                <Route element={ <AdminProtectedRoute /> }>
-                  <Route path="/admin" element={ <AdminLayout /> }>
-                    <Route index element={ <AdminDashboard /> } />
-                    <Route path="orders" element={ <ManageOrders /> } />
-                    <Route path="items" element={ <ManageItems /> } />
-                    <Route path="ingredients" element={ <ManageIngredients /> } />
+                {/* 🧑‍💼 Admin-only protected routes */}
+                <Route element={<AdminProtectedRoute />}>
+                  <Route path="/admin" element={<AdminLayout />}>
+                    <Route index element={<AdminDashboard />} />
+                    <Route path="orders" element={<ManageOrders />} />
+                    <Route path="items" element={<ManageItems />} />
+                    <Route path="ingredients" element={<ManageIngredients />} />
+                    <Route path="sales-stats" element={<AdminSalesStats />} />
                   </Route>
                 </Route>
               </Routes>
