@@ -70,7 +70,7 @@ Originally built for **NCSU**, the system is adaptable for any university café 
 
 ## 📽️ Demo Video (4 min)
 🎥 **[Watch the Demo]([https://drive.google.com/file/d/1rF2Nw3hMvygaE4dNnrE-KzBt6mMmS3zz/view?usp=drive_link](https://discord.com/channels/1416897055791779880/1416903107706753146/1447622614477574365))**  
-_
+
 ---
 
 ## 📦 Installation
@@ -217,4 +217,4 @@ wrikicafe is built with the **MERN stack (MongoDB, Express.js, React, Node.js)**
 ## 🧾 License
 This project is released under the terms described in [LICENSE.md](LICENSE.md).
 
-© 2025 WrikiCafe+ Team 16 · North Carolina State University
+© 2025 WrikiCafe+ Team 19 · North Carolina State University
