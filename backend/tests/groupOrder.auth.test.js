@@ -1,5 +1,6 @@
 // tests/groupOrder.auth.test.js
 import dotenv from "dotenv";
+import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
 import request from "supertest";
 
@@ -10,17 +11,12 @@ import Order from "../api/models/Order.js";
 
 dotenv.config();
 
-const uri = process.env.MONGO_URI;
-
 describe("Group Order API – Auth protection", () => {
-  beforeAll(async () => {
-    if (!uri) {
-      throw new Error("MONGO_URI not set in .env for tests");
-    }
+  let mongoServer;
 
-    await mongoose.connect(uri, {
-      dbName: "wrikicafe_test_group_orders_auth",
-    });
+  beforeAll(async () => {
+    mongoServer = await MongoMemoryServer.create();
+    await mongoose.connect(mongoServer.getUri());
 
     await Promise.all([
       GroupOrder.deleteMany({}),
@@ -30,15 +26,8 @@ describe("Group Order API – Auth protection", () => {
   }, 30000);
 
   afterAll(async () => {
-    try {
-      await mongoose.connection.dropDatabase();
-    } catch (e) {
-      console.error(
-        "dropDatabase failed in auth tests (safe to ignore in local dev):",
-        e.message
-      );
-    }
     await mongoose.disconnect();
+    await mongoServer.stop();
   });
 
   it("rejects creating a group order without auth", async () => {

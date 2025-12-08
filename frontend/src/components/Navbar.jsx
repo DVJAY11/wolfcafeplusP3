@@ -61,93 +61,71 @@ export default function Navbar() {
           transparent
             ? "bg-transparent text-white"
             : "bg-black/90 text-white shadow-md"
-        }`}
+          }` }
       >
-        {/* Logo */}
+        {/* Logo */ }
         <Link to="/" className="flex items-center space-x-3">
           <img
             src="/logo.png"
             alt="WrikiCafe Logo"
-            className="h-12 w-12 md:h-16 md:w-16 object-contain"
+                        className="h-12 w-12 md:h-16 md:w-16 object-contain"
           />
           <span className="text-2xl md:text-4xl tracking-widest font-bold">
-            <span
-              style={{ fontFamily: "'Anton', sans-serif" }}
-              className="text-white"
-            >
-              WRIKI
-            </span>
-            <span
-              style={{ fontFamily: "'Playfair Display', serif" }}
-              className="text-red-600 ml-1"
-            >
-              CAFE+
-            </span>
+            <span style={{ fontFamily: "'Anton', sans-serif" }} className="text-white">WRIKI</span>
+            <span style={{ fontFamily: "'Playfair Display', serif" }} className="text-red-600 ml-1">CAFE+</span>
           </span>
         </Link>
 
         {/* Center nav links */}
         <div className="hidden md:flex flex-1 justify-center">
           <div className="flex items-center gap-6 lg:gap-10 text-sm lg:text-base font-medium">
-            <Link to="/" className="hover:text-red-500 transition">
-              Home
+            <Link to="/" className="hover:text-red-500 transition">Home</Link>
+            <Link to="/menu" className="hover:text-red-500 transition">Menu</Link>
+
+            {/* ✅ YOUR BRANCH: Smart Order */}
+            <Link to="/smart-order" className="hover:text-red-500 transition flex items-center gap-1">
+              <span role="img" aria-label="robot">🤖</span>
+              <span>Smart Order</span>
             </Link>
 
-            <Link to="/menu" className="hover:text-red-500 transition">
-              Menu
-            </Link>
-
-            <Link
-              to="/build-your-own"
-              className="hover:text-red-500 transition flex items-center gap-1"
-            >
+            {/* ✅ MAIN: Build Your Own */}
+            <Link to="/build-your-own" className="hover:text-red-500 transition flex items-center gap-1">
               <span>Build Your Own</span>
-              <span role="img" aria-label="tools">
-                🛠️
-              </span>
+              <span role="img" aria-label="tools">🛠️</span>
             </Link>
 
-            <Link
-              to="/group-order"
-              className="hover:text-red-500 transition flex items-center gap-1"
-            >
+            {/* ✅ MAIN: Group Order */}
+            <Link to="/group-order" className="hover:text-red-500 transition flex items-center gap-1">
               <span>Group Order</span>
-              <span role="img" aria-label="group">
-                👥
-              </span>
+              <span role="img" aria-label="group">👥</span>
             </Link>
 
-            <Link
-              to="/my-group-orders"
-              className="hover:text-red-500 transition flex items-center gap-1 whitespace-nowrap"
-            >
+            {/* ✅ MAIN: My Group Orders */}
+            <Link to="/my-group-orders" className="hover:text-red-500 transition flex items-center gap-1 whitespace-nowrap">
               <span>My Group Orders</span>
-              <span role="img" aria-label="friends">
-                👯
-              </span>
+              <span role="img" aria-label="friends">👯</span>
             </Link>
 
-            <Link to="/about" className="hover:text-red-500 transition">
-              About Us
-            </Link>
+            <Link to="/about" className="hover:text-red-500 transition">About Us</Link>
           </div>
         </div>
 
         {/* Right side: cart + user */}
         <div className="flex items-center gap-4">
           {/* Cart */}
-          <Link
-            to="/cart"
-            className="hover:text-red-500 transition flex items-center gap-1 relative text-sm md:text-base"
-          >
+          <Link to="/cart" className="hover:text-red-500 transition flex items-center gap-1 relative text-sm md:text-base">
             <ShoppingCart size={18} />
             <span className="hidden sm:inline">Cart</span>
             {totalItems > 0 && (
               <span className="absolute -top-2 -right-3 bg-red-600 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
-                {totalItems}
+                { totalItems }
               </span>
-            )}
+            ) }
           </Link>
+
+          {user?.role === "admin" && (
+            <Link to="/admin" className="hover:text-red-500 transition flex items-center gap-2">Admin</Link>
+          )}
 
           {/* Auth controls */}
           {user ? (
@@ -169,76 +147,68 @@ export default function Navbar() {
             >
               Login
             </button>
-          )}
+          ) }
         </div>
       </nav>
 
-      {/* Login / Signup Modal */}
-      {showLogin && (
+      {/* 🔸 Login / Signup Modal (unchanged) */ }
+      { showLogin && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-[100]">
           <div className="bg-white p-6 rounded-lg w-80 shadow-lg relative">
             <button
-              onClick={hideLoginModal}
+              onClick={ () => hideLoginModal() }
               className="absolute top-2 right-3 text-gray-500 text-lg font-bold"
             >
               ×
             </button>
 
             <h2 className="text-xl font-semibold text-center mb-4 text-gray-700">
-              {isSignup ? "Create Account" : "Login"}
+              { isSignup ? "Create Account" : "Login" }
             </h2>
 
-            <form onSubmit={handleSubmit}>
-              {isSignup && (
+            <form onSubmit={ handleSubmit }>
+              { isSignup && (
                 <input
                   type="text"
                   placeholder="Name"
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
+                  value={ formData.name }
+                  onChange={ (e) => setFormData({ ...formData, name: e.target.value }) }
                   required
                   className="w-full border border-gray-300 rounded-md p-2 mb-3 focus:ring-2 focus:ring-red-400"
                 />
-              )}
+              ) }
               <input
                 type="email"
                 placeholder="Email"
-                value={formData.email}
-                onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
-                }
+                value={ formData.email }
+                onChange={ (e) => setFormData({ ...formData, email: e.target.value }) }
                 required
                 className="w-full border border-gray-300 rounded-md p-2 mb-3 focus:ring-2 focus:ring-red-400"
               />
               <input
                 type="password"
                 placeholder="Password"
-                value={formData.password}
-                onChange={(e) =>
-                  setFormData({ ...formData, password: e.target.value })
-                }
+                value={ formData.password }
+                onChange={ (e) => setFormData({ ...formData, password: e.target.value }) }
                 required
                 className="w-full border border-gray-300 rounded-md p-2 mb-3 focus:ring-2 focus:ring-red-400"
               />
-              {error && (
-                <p className="text-red-500 text-sm mb-2">{error}</p>
-              )}
+              { error && <p className="text-red-500 text-sm mb-2">{ error }</p> }
 
               <button
                 type="submit"
                 className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2 rounded-md"
               >
-                {isSignup ? "Sign Up" : "Login"}
+                { isSignup ? "Sign Up" : "Login" }
               </button>
             </form>
 
             <p className="text-center mt-3 text-gray-600 text-sm">
-              {isSignup ? (
+              { isSignup ? (
                 <>
-                  Already have an account?{" "}
+                  Already have an account?{ " " }
                   <button
-                    onClick={() => setIsSignup(false)}
+                    onClick={ () => setIsSignup(false) }
                     className="text-red-600 underline"
                   >
                     Login
@@ -246,19 +216,19 @@ export default function Navbar() {
                 </>
               ) : (
                 <>
-                  Don’t have an account?{" "}
+                  Don’t have an account?{ " " }
                   <button
-                    onClick={() => setIsSignup(true)}
+                    onClick={ () => setIsSignup(true) }
                     className="text-red-600 underline"
                   >
                     Sign up
                   </button>
                 </>
-              )}
+              ) }
             </p>
           </div>
         </div>
-      )}
+      ) }
     </>
   );
 }

@@ -3,6 +3,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 
+import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
 import request from "supertest";
 import jwt from "jsonwebtoken";
@@ -34,16 +35,11 @@ describe("Group Order API", () => {
   let menuItem;
   let creatorToken;
   let otherToken;
+  let mongoServer;
 
   beforeAll(async () => {
-    const uri = process.env.MONGO_URI;
-    if (!uri) {
-      throw new Error("MONGO_URI not set in .env for tests");
-    }
-
-    await mongoose.connect(uri, {
-      dbName: "wrikicafe_test_group_orders",
-    });
+    mongoServer = await MongoMemoryServer.create();
+    await mongoose.connect(mongoServer.getUri());
 
     server = app;
 
@@ -67,15 +63,8 @@ describe("Group Order API", () => {
   }, 30000);
 
   afterAll(async () => {
-    try {
-      await GroupOrder.deleteMany({});
-      await MenuItem.deleteMany({});
-      await Order.deleteMany({});
-      await mongoose.connection.dropDatabase();
-    } catch (e) {
-      console.error("Error cleaning up test DB:", e.message);
-    }
     await mongoose.disconnect();
+    await mongoServer.stop();
   });
 
   // ---------------------------------------------------------------------------
