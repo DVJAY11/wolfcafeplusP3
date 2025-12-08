@@ -27,6 +27,9 @@ const orderSchema = new mongoose.Schema({
       },
     }
   ],
+  subtotal: { type: Number, required: true },
+  tip: { type: Number, default: 0 },
+  total: { type: Number, required: true },
   status: {
     type: String,
     enum: ["pending", "in_progress", "ready", "completed"],

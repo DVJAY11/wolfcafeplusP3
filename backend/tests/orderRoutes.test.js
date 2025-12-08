@@ -18,7 +18,8 @@ jest.unstable_mockModule("../api/controllers/orderController.js", () => ({
   getAllOrders: jest.fn((req, res) => res.status(200).json([{ id: 1, total: 15.5 }])),
   updateOrderStatus: jest.fn((req, res) =>
     res.status(200).json({ message: "Order status updated" })
-  )
+  ),
+  getUserOrderHistory: jest.fn((req, res) => res.status(200).json([{ id: 1, status: "completed" }]))
 }));
 
 // Import router AFTER mocks are defined

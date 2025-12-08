@@ -5,15 +5,16 @@ import { sendEmail } from "../utils/sendEmail.js";
 
 export const createOrder = async (req, res) => {
   try {
-    const { items, total, tip } = req.body;
+    const { items, subtotal, tip, total } = req.body;
     if (!req.user || !req.user.id)
       return res.status(401).json({ message: "User not authenticated" });
 
     const newOrder = new Order({
       user: req.user.id,
       items,
+      subtotal,
+      tip: tip || 0,
       total,
-      tip,
       status: "pending",
     });
 
@@ -23,6 +24,21 @@ export const createOrder = async (req, res) => {
     io.emit("new_order", newOrder);
 
     res.status(201).json(newOrder);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const getUserOrderHistory = async (req, res) => {
+  try {
+    if (!req.user || !req.user.id)
+      return res.status(401).json({ message: "User not authenticated" });
+
+    const orders = await Order.find({ user: req.user.id })
+      .populate("items.menuItem")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json(orders);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
