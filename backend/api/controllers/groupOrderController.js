@@ -355,6 +355,34 @@ export const leaveGroupOrder = async (req, res) => {
   }
 };
 
+export const getMyGroupOrders = async (req, res) => {
+  try {
+    const userId = req.user.id || req.user._id;
+
+    // 🔑 return any group order where:
+    // - you are the creator OR
+    // - you appear in participants.user
+    const groupOrders = await GroupOrder.find({
+      $or: [
+        { creator: userId },
+        { "participants.user": userId },
+      ],
+      // ❌ DO NOT filter by status: "open" here;
+      // we want CLOSED / FINALIZED orders too.
+    })
+      .sort({ createdAt: -1 })
+      .populate("creator", "name email")
+      .populate("participants.user", "name email")
+      .populate("participants.items.menuItem");
+
+    return res.json({ groupOrders });
+  } catch (err) {
+    console.error("Error in getMyGroupOrders:", err);
+    return res.status(500).json({ message: "Failed to fetch group orders" });
+  }
+};
+
+
 /**
  * POST /api/group-orders/:id/finalize
  * Creator finalizes; creates individual Order docs for each participant

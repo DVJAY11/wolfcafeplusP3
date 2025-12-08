@@ -99,6 +99,21 @@ export default function GroupOrderSession() {
     (sum, p) => sum + (p.items?.length || 0),
     0
   );
+  
+  // 💰 helper: compute one participant's subtotal from their items
+  const computeParticipantSubtotal = (participant) => {
+    if (!participant?.items) return 0;
+
+    return participant.items.reduce((sum, item) => {
+      const basePrice = item.menuItem?.price || 0;
+      const customTotal = (item.customizations || []).reduce(
+        (s, c) => s + (c.price || 0),
+        0
+      );
+      const qty = item.quantity || 1;
+      return sum + (basePrice + customTotal) * qty;
+    }, 0);
+  };
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-10">
@@ -117,19 +132,61 @@ export default function GroupOrderSession() {
       </div>
 
       <div className="mb-6">
-        <h2 className="text-xl font-semibold mb-2">Participants</h2>
-        {(groupOrder.participants || []).length === 0 ? (
-          <p className="text-gray-600">No participants yet.</p>
-        ) : (
-          <ul className="list-disc pl-5 space-y-1">
-            {groupOrder.participants.map((p) => (
-              <li key={p._id}>
-                {p.user?.name || p.user?.email || "Unknown user"} –{" "}
-                {(p.items || []).length} item(s)
-              </li>
-            ))}
-          </ul>
-        )}
+      <h2 className="text-2xl font-semibold mb-2">Participants</h2>
+      <section className="mt-6">
+      <h2 className="text-2xl font-semibold mb-2">Participants</h2>
+
+      <ul className="space-y-4">
+        {groupOrder.participants?.map((p) => {
+          const subtotal = computeParticipantSubtotal(p);
+          const items = p.items || [];
+
+          return (
+            <li
+              key={p._id || p.user?._id}
+              className="border border-gray-200 rounded-lg p-3 bg-white shadow-sm"
+            >
+              {/* Header line: Name + total items + subtotal */}
+              <div className="flex justify-between items-center mb-1">
+                <span className="font-semibold text-lg">
+                  {p.user?.name || "Guest"}
+                </span>
+
+                <span className="text-sm text-gray-700">
+                  {items.length} item(s) • ${subtotal.toFixed(2)}
+                </span>
+              </div>
+
+              {/* Item list */}
+              {items.length > 0 && (
+                <ul className="ml-4 mt-1 list-disc text-sm text-gray-700 space-y-1">
+                  {items.map((item) => {
+                    const basePrice = item.menuItem?.price || 0;
+                    const customTotal = (item.customizations || []).reduce(
+                      (s, c) => s + (c.price || 0),
+                      0
+                    );
+                    const unitPrice = basePrice + customTotal;
+                    const qty = item.quantity || 1;
+
+                    return (
+                      <li key={item._id}>
+                        <span className="font-medium">
+                          {item.menuItem?.name || "Item"}
+                        </span>
+                        {` × ${qty} — $${(unitPrice * qty).toFixed(2)}`}
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+
+
       </div>
 
       <div className="mb-6">

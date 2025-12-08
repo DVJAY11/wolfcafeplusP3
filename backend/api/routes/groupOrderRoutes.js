@@ -9,14 +9,22 @@ import {
   removeItemFromGroupOrder,
   leaveGroupOrder,
   finalizeGroupOrder,
+  getMyGroupOrders,
 } from "../controllers/groupOrderController.js";
 
 const router = express.Router();
+
+/**
+ * GET /api/group-orders/mine
+ * Return all group orders that the logged-in user is part of
+ */
+router.get("/mine", verifyToken, getMyGroupOrders);
 
 // Create a group order
 router.post("/", verifyToken, createGroupOrder);
 
 // Get group order details via shareCode (for join / view)
+// NOTE: keep this BELOW `/mine` so "mine" doesn't get treated as :shareCode
 router.get("/:shareCode", verifyToken, getGroupOrder);
 
 // Join via share code

@@ -22,7 +22,7 @@ import { ModalProvider } from "./context/ModalContext";
 
 import GroupOrder from "./pages/GroupOrder";
 import GroupOrderSession from "./pages/GroupOrderSession";
-
+import MyGroupOrders from "./pages/MyGroupOrders";
 // ✅ Wrapper to handle conditional padding
 function PageWrapper({ children }) {
   const location = useLocation();
@@ -50,7 +50,7 @@ function App() {
                   <Route path="/about" element={<AboutUs />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/build-your-own" element={<BuildYourOwn />} />
-
+                  
                   {/* 🔒 Authenticated (non-admin) protected routes */}
                   <Route element={<ProtectedRoute />}>
                     {/* 👉 Group Order routes should require login */}
@@ -59,7 +59,7 @@ function App() {
                       path="/group-order/:shareCode"
                       element={<GroupOrderSession />}
                     />
-
+                    <Route path="/my-group-orders" element={<MyGroupOrders />} />
                     {/* example placeholder; you can add user-only routes here */}
                     {/* <Route path="/profile" element={<UserProfile />} /> */}
                   </Route>

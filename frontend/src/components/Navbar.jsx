@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { useModal } from "../context/ModalContext";
-import { useCart } from "../context/CartContext"; // ✅ import this
+import { useCart } from "../context/CartContext";
 import api from "../api/axios";
 import { ShoppingCart } from "lucide-react";
 
@@ -10,8 +10,13 @@ export default function Navbar() {
   const { user, logout, login } = useContext(AuthContext);
   const { showLogin, showLoginModal, hideLoginModal } = useModal();
   const { cart } = useCart();
+
   const [isSignup, setIsSignup] = useState(false);
-  const [formData, setFormData] = useState({ name: "", email: "", password: "" });
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
   const [error, setError] = useState("");
   const location = useLocation();
   const [scrolled, setScrolled] = useState(false);
@@ -22,21 +27,22 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Calculate total items in cart (sum of all quantities)
-  const totalItems = cart.reduce((sum, item) => sum + (item.quantity || item.qty || 0), 0);
+  // total items in cart
+  const totalItems = cart.reduce(
+    (sum, item) => sum + (item.quantity || item.qty || 0),
+    0
+  );
 
-  // handle login or signup
+  // login / signup submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     try {
       if (isSignup) {
-        // --- Sign Up API call ---
         await api.post("/auth/register", formData);
         alert("Account created successfully! Please log in.");
         setIsSignup(false);
       } else {
-        // --- Login (existing AuthContext logic) ---
         await login(formData.email, formData.password);
         hideLoginModal();
       }
@@ -51,129 +57,188 @@ export default function Navbar() {
   return (
     <>
       <nav
-        className={ `fixed top-0 left-0 w-full z-50 flex justify-between items-center px-10 py-4 transition-colors duration-300 ${transparent
+        className={`fixed top-0 left-0 w-full z-50 flex items-center justify-between px-8 md:px-10 py-4 transition-colors duration-300 ${
+          transparent
             ? "bg-transparent text-white"
             : "bg-black/90 text-white shadow-md"
-          }` }
+        }`}
       >
-        {/* Logo */ }
+        {/* Logo */}
         <Link to="/" className="flex items-center space-x-3">
           <img
             src="/logo.png"
             alt="WrikiCafe Logo"
-            className="h-16 w-16 object-contain"
-            style={ { marginRight: "0.05rem" } }
+            className="h-12 w-12 md:h-16 md:w-16 object-contain"
           />
-          <span className="text-4xl tracking-widest font-bold">
-            <span style={ { fontFamily: "'Anton', sans-serif" } } className="text-white">WRIKI</span>
-            <span style={ { fontFamily: "'Playfair Display', serif" } } className="text-red-600 ml-1">CAFE+</span>
+          <span className="text-2xl md:text-4xl tracking-widest font-bold">
+            <span
+              style={{ fontFamily: "'Anton', sans-serif" }}
+              className="text-white"
+            >
+              WRIKI
+            </span>
+            <span
+              style={{ fontFamily: "'Playfair Display', serif" }}
+              className="text-red-600 ml-1"
+            >
+              CAFE+
+            </span>
           </span>
         </Link>
 
-        {/* Navigation Links */ }
-        <div className="flex items-center space-x-8 text-base font-medium">
-          <Link to="/" className="hover:text-red-500 transition">Home</Link>
-          <Link to="/menu" className="hover:text-red-500 transition">Menu</Link>
-          <Link to="/build-your-own" className="hover:text-red-500 transition">Build Your Own 🛠️</Link>
-          <Link to="/group-order" className="hover:text-red-500 transition">Group Order 👥</Link>
-          <Link to="/about" className="hover:text-red-600">About Us</Link>
+        {/* Center nav links */}
+        <div className="hidden md:flex flex-1 justify-center">
+          <div className="flex items-center gap-6 lg:gap-10 text-sm lg:text-base font-medium">
+            <Link to="/" className="hover:text-red-500 transition">
+              Home
+            </Link>
 
-          {/* Cart Badge Updated Dynamically */ }
-          <Link to="/cart" className="hover:text-red-500 transition flex items-center gap-2 relative">
-            <ShoppingCart size={ 18 } />
-            <span>Cart</span>
-            { totalItems > 0 && (
-              <span className="absolute -top-2 -right-3 bg-red-600 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
-                { totalItems }
+            <Link to="/menu" className="hover:text-red-500 transition">
+              Menu
+            </Link>
+
+            <Link
+              to="/build-your-own"
+              className="hover:text-red-500 transition flex items-center gap-1"
+            >
+              <span>Build Your Own</span>
+              <span role="img" aria-label="tools">
+                🛠️
               </span>
-            ) }
-          </Link>
+            </Link>
 
-          { user?.role === "admin" && (
-            <Link to="/admin" className="hover:text-red-500 transition flex items-center gap-2">Admin</Link>
-          ) }
+            <Link
+              to="/group-order"
+              className="hover:text-red-500 transition flex items-center gap-1"
+            >
+              <span>Group Order</span>
+              <span role="img" aria-label="group">
+                👥
+              </span>
+            </Link>
+
+            <Link
+              to="/my-group-orders"
+              className="hover:text-red-500 transition flex items-center gap-1 whitespace-nowrap"
+            >
+              <span>My Group Orders</span>
+              <span role="img" aria-label="friends">
+                👯
+              </span>
+            </Link>
+
+            <Link to="/about" className="hover:text-red-500 transition">
+              About Us
+            </Link>
+          </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          { user ? (
+        {/* Right side: cart + user */}
+        <div className="flex items-center gap-4">
+          {/* Cart */}
+          <Link
+            to="/cart"
+            className="hover:text-red-500 transition flex items-center gap-1 relative text-sm md:text-base"
+          >
+            <ShoppingCart size={18} />
+            <span className="hidden sm:inline">Cart</span>
+            {totalItems > 0 && (
+              <span className="absolute -top-2 -right-3 bg-red-600 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
+                {totalItems}
+              </span>
+            )}
+          </Link>
+
+          {/* Auth controls */}
+          {user ? (
             <>
-              <span className="text-sm text-white-600">Welcome, { user.name }</span>
+              <span className="hidden sm:inline text-sm text-gray-100">
+                Welcome, {user.name}
+              </span>
               <button
-                onClick={ logout }
-                className="bg-white hover:bg-gray-100 text-red-700 px-3 py-1 rounded-full font-semibold"
+                onClick={logout}
+                className="bg-white hover:bg-gray-100 text-red-700 px-3 py-1 rounded-full font-semibold text-sm"
               >
                 Logout
               </button>
             </>
           ) : (
             <button
-              onClick={ () => showLoginModal() }
-              className="bg-white hover:bg-gray-100 text-red-700 px-3 py-1 rounded-full font-semibold"
+              onClick={showLoginModal}
+              className="bg-white hover:bg-gray-100 text-red-700 px-3 py-1 rounded-full font-semibold text-sm"
             >
               Login
             </button>
-          ) }
+          )}
         </div>
       </nav>
 
-      {/* 🔸 Login / Signup Modal (unchanged) */ }
-      { showLogin && (
+      {/* Login / Signup Modal */}
+      {showLogin && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-[100]">
           <div className="bg-white p-6 rounded-lg w-80 shadow-lg relative">
             <button
-              onClick={ () => hideLoginModal() }
+              onClick={hideLoginModal}
               className="absolute top-2 right-3 text-gray-500 text-lg font-bold"
             >
               ×
             </button>
 
             <h2 className="text-xl font-semibold text-center mb-4 text-gray-700">
-              { isSignup ? "Create Account" : "Login" }
+              {isSignup ? "Create Account" : "Login"}
             </h2>
 
-            <form onSubmit={ handleSubmit }>
-              { isSignup && (
+            <form onSubmit={handleSubmit}>
+              {isSignup && (
                 <input
                   type="text"
                   placeholder="Name"
-                  value={ formData.name }
-                  onChange={ (e) => setFormData({ ...formData, name: e.target.value }) }
+                  value={formData.name}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
                   required
                   className="w-full border border-gray-300 rounded-md p-2 mb-3 focus:ring-2 focus:ring-red-400"
                 />
-              ) }
+              )}
               <input
                 type="email"
                 placeholder="Email"
-                value={ formData.email }
-                onChange={ (e) => setFormData({ ...formData, email: e.target.value }) }
+                value={formData.email}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
                 required
                 className="w-full border border-gray-300 rounded-md p-2 mb-3 focus:ring-2 focus:ring-red-400"
               />
               <input
                 type="password"
                 placeholder="Password"
-                value={ formData.password }
-                onChange={ (e) => setFormData({ ...formData, password: e.target.value }) }
+                value={formData.password}
+                onChange={(e) =>
+                  setFormData({ ...formData, password: e.target.value })
+                }
                 required
                 className="w-full border border-gray-300 rounded-md p-2 mb-3 focus:ring-2 focus:ring-red-400"
               />
-              { error && <p className="text-red-500 text-sm mb-2">{ error }</p> }
+              {error && (
+                <p className="text-red-500 text-sm mb-2">{error}</p>
+              )}
 
               <button
                 type="submit"
                 className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2 rounded-md"
               >
-                { isSignup ? "Sign Up" : "Login" }
+                {isSignup ? "Sign Up" : "Login"}
               </button>
             </form>
 
             <p className="text-center mt-3 text-gray-600 text-sm">
-              { isSignup ? (
+              {isSignup ? (
                 <>
-                  Already have an account?{ " " }
+                  Already have an account?{" "}
                   <button
-                    onClick={ () => setIsSignup(false) }
+                    onClick={() => setIsSignup(false)}
                     className="text-red-600 underline"
                   >
                     Login
@@ -181,19 +246,19 @@ export default function Navbar() {
                 </>
               ) : (
                 <>
-                  Don’t have an account?{ " " }
+                  Don’t have an account?{" "}
                   <button
-                    onClick={ () => setIsSignup(true) }
+                    onClick={() => setIsSignup(true)}
                     className="text-red-600 underline"
                   >
                     Sign up
                   </button>
                 </>
-              ) }
+              )}
             </p>
           </div>
         </div>
-      ) }
+      )}
     </>
   );
 }

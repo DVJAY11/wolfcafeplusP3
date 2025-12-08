@@ -1,75 +1,91 @@
+// frontend/src/pages/GroupOrder.js
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGroupOrder } from "../context/GroupOrderContext";
 
-const GroupOrder = () => {
-  const navigate = useNavigate();
-  const {
-    startGroupOrder,
-    joinGroupOrderWithCode,
-    shareCode,
-    groupOrder,
-    loading,
-  } = useGroupOrder();
-
+export default function GroupOrder() {
   const [joinCode, setJoinCode] = useState("");
+  const navigate = useNavigate();
 
+  // 👇 pull actions from context
+  const { startGroupOrder, joinGroupOrder } = useGroupOrder();
+
+  // Start a brand-new group order as the current user
   const handleStart = async () => {
     try {
-      const order = await startGroupOrder();
-      navigate(`/group-order/${order.shareCode}`);
+      const group = await startGroupOrder();
+      // go straight into that session
+      navigate(`/group-order/${group.shareCode}`);
     } catch (err) {
-      alert("Failed to start group order");
+      console.error("Failed to start group order:", err);
+      const msg =
+        err?.response?.data?.message ||
+        err?.message ||
+        "Failed to start group order. Please try again.";
+      alert(msg);
     }
   };
 
-  const handleJoin = async (e) => {
-    e.preventDefault();
-    if (!joinCode.trim()) return;
+  // Join an existing group order by share code
+  const handleJoin = async () => {
+    const code = joinCode.trim();
+    if (!code) {
+      alert("Please enter a group code.");
+      return;
+    }
 
     try {
-      const order = await joinGroupOrderWithCode(joinCode.trim().toUpperCase());
-      navigate(`/group-order/${order.shareCode}`);
+      await joinGroupOrder(code);
+      navigate(`/group-order/${code}`);
     } catch (err) {
-      alert("Failed to join group order. Check the code and try again.");
+      console.error("Failed to join group order:", err);
+
+      const msg =
+        err?.response?.data?.message ||
+        err?.message ||
+        "Failed to join group order. Check the code and try again.";
+
+      alert(msg);
     }
   };
 
   return (
-    <div style={{ maxWidth: 480, margin: "2rem auto" }}>
-      <h1>Group Order</h1>
+    <div className="max-w-xl mx-auto pt-24 px-4">
+      <h1 className="text-3xl font-bold mb-6">Group Order</h1>
 
-      <section style={{ marginBottom: "2rem" }}>
-        <h2>Start a Group Order</h2>
-        <p>Create a new group order and share the code with friends.</p>
-        <button onClick={handleStart} disabled={loading}>
-          {loading ? "Starting..." : "Start Group Order"}
+      {/* Start a new group order */}
+      <section className="mb-10">
+        <h2 className="text-xl font-semibold mb-2">Start a Group Order</h2>
+        <p className="text-gray-700 mb-3">
+          Create a new group order and share the code with friends.
+        </p>
+        <button
+          onClick={handleStart}
+          className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium"
+        >
+          Start Group Order
         </button>
-        {shareCode && groupOrder && (
-          <p style={{ marginTop: "0.5rem" }}>
-            Active code: <strong>{shareCode}</strong>
-          </p>
-        )}
       </section>
 
+      {/* Join existing group order */}
       <section>
-        <h2>Join a Group Order</h2>
-        <form onSubmit={handleJoin}>
+        <h2 className="text-xl font-semibold mb-2">Join a Group Order</h2>
+        <div className="flex items-center gap-3">
           <input
             type="text"
-            maxLength={6}
-            placeholder="Enter code (e.g., YX5TQ0)"
             value={joinCode}
-            onChange={(e) => setJoinCode(e.target.value)}
-            style={{ textTransform: "uppercase" }}
+            onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
+            placeholder="Enter group code"
+            className="border rounded-lg px-3 py-2 flex-1"
           />
-          <button type="submit" disabled={loading}>
-            {loading ? "Joining..." : "Join"}
+          <button
+            onClick={handleJoin}
+            className="bg-gray-900 hover:bg-black text-white px-4 py-2 rounded-lg font-medium"
+          >
+            Join
           </button>
-        </form>
+        </div>
       </section>
     </div>
   );
-};
-
-export default GroupOrder;
+}
