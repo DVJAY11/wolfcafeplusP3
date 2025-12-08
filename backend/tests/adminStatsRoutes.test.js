@@ -2,23 +2,23 @@ import { jest } from "@jest/globals";
 import request from "supertest";
 import express from "express";
 
-// Mock the middleware and controllers
-jest.mock("../api/middleware/authMiddleware.js", () => ({
-    verifyToken: (req, res, next) => {
+// Mock the middleware and controllers using ESM-compatible mocking
+jest.unstable_mockModule("../api/middleware/authMiddleware.js", () => ({
+    verifyToken: jest.fn((req, res, next) => {
         req.user = { id: "testUserId", role: "admin" };
         next();
-    },
+    }),
 }));
 
-jest.mock("../api/middleware/roleMiddleware.js", () => ({
-    allowRoles: () => (req, res, next) => next(),
+jest.unstable_mockModule("../api/middleware/roleMiddleware.js", () => ({
+    allowRoles: jest.fn(() => (req, res, next) => next()),
 }));
 
-jest.mock("../api/controllers/adminController.js", () => ({
+jest.unstable_mockModule("../api/controllers/adminController.js", () => ({
     getAdminStats: jest.fn((req, res) => res.json({ success: true })),
 }));
 
-jest.mock("../api/controllers/adminStatsController.js", () => ({
+jest.unstable_mockModule("../api/controllers/adminStatsController.js", () => ({
     getItemsSoldStats: jest.fn((req, res) =>
         res.json({
             totalOrders: 10,
@@ -43,7 +43,7 @@ jest.mock("../api/controllers/adminStatsController.js", () => ({
 }));
 
 // Import router after mocking
-import adminRoutes from "../api/routes/adminRoutes.js";
+const { default: adminRoutes } = await import("../api/routes/adminRoutes.js");
 
 describe("Admin Stats Routes", () => {
     let app;
