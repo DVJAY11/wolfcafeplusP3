@@ -65,7 +65,9 @@ describe("🧂 ManageIngredients", () => {
 		});
 
 		expect(screen.getByText("Whole Milk")).toBeInTheDocument();
-		expect(screen.getByText("$0.50")).toBeInTheDocument();
+		// Use getAllByText since multiple ingredients have the same price
+		const priceElements = screen.getAllByText("$0.50");
+		expect(priceElements.length).toBeGreaterThan(0);
 	});
 
 	test("displays availability status for ingredients", async () => {
