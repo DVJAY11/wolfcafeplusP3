@@ -57,10 +57,9 @@ export default function Navbar() {
   return (
     <>
       <nav
-        className={`fixed top-0 left-0 w-full z-50 flex items-center justify-between px-8 md:px-10 py-4 transition-colors duration-300 ${
-          transparent
-            ? "bg-transparent text-white"
-            : "bg-black/90 text-white shadow-md"
+        className={ `fixed top-0 left-0 w-full z-50 flex items-center justify-between px-8 md:px-10 py-4 transition-colors duration-300 ${transparent
+          ? "bg-transparent text-white"
+          : "bg-black/90 text-white shadow-md"
           }` }
       >
         {/* Logo */ }
@@ -68,73 +67,69 @@ export default function Navbar() {
           <img
             src="/logo.png"
             alt="WrikiCafe Logo"
-                        className="h-12 w-12 md:h-16 md:w-16 object-contain"
+            className="h-12 w-12 md:h-16 md:w-16 object-contain"
           />
           <span className="text-2xl md:text-4xl tracking-widest font-bold">
-            <span style={{ fontFamily: "'Anton', sans-serif" }} className="text-white">WRIKI</span>
-            <span style={{ fontFamily: "'Playfair Display', serif" }} className="text-red-600 ml-1">CAFE+</span>
+            <span style={ { fontFamily: "'Anton', sans-serif" } } className="text-white">WRIKI</span>
+            <span style={ { fontFamily: "'Playfair Display', serif" } } className="text-red-600 ml-1">CAFE+</span>
           </span>
         </Link>
 
-        {/* Center nav links */}
+        {/* Center nav links */ }
         <div className="hidden md:flex flex-1 justify-center">
           <div className="flex items-center gap-6 lg:gap-10 text-sm lg:text-base font-medium">
             <Link to="/" className="hover:text-red-500 transition">Home</Link>
             <Link to="/menu" className="hover:text-red-500 transition">Menu</Link>
 
-            {/* ✅ YOUR BRANCH: Smart Order */}
+            {/* ✅ YOUR BRANCH: Smart Order */ }
             <Link to="/smart-order" className="hover:text-red-500 transition flex items-center gap-1">
-              <span role="img" aria-label="robot">🤖</span>
               <span>Smart Order</span>
             </Link>
 
-            {/* ✅ MAIN: Build Your Own */}
+            {/* ✅ MAIN: Build Your Own */ }
             <Link to="/build-your-own" className="hover:text-red-500 transition flex items-center gap-1">
-              <span>Build Your Own</span>
-              <span role="img" aria-label="tools">🛠️</span>
+              <span>BYO</span>
             </Link>
 
-            {/* ✅ MAIN: Group Order */}
+            {/* ✅ MAIN: Group Order */ }
             <Link to="/group-order" className="hover:text-red-500 transition flex items-center gap-1">
               <span>Group Order</span>
-              <span role="img" aria-label="group">👥</span>
             </Link>
 
-            {/* ✅ MAIN: My Group Orders */}
+            {/* ✅ MAIN: My Group Orders */ }
             <Link to="/my-group-orders" className="hover:text-red-500 transition flex items-center gap-1 whitespace-nowrap">
               <span>My Group Orders</span>
-              <span role="img" aria-label="friends">👯</span>
             </Link>
 
             <Link to="/about" className="hover:text-red-500 transition">About Us</Link>
           </div>
         </div>
 
-        {/* Right side: cart + user */}
+        {/* Right side: cart + user */ }
         <div className="flex items-center gap-4">
-          {/* Cart */}
+          {/* Cart */ }
           <Link to="/cart" className="hover:text-red-500 transition flex items-center gap-1 relative text-sm md:text-base">
-            <ShoppingCart size={18} />
+            <ShoppingCart size={ 18 } />
             <span className="hidden sm:inline">Cart</span>
-            {totalItems > 0 && (
+            { totalItems > 0 && (
               <span className="absolute -top-2 -right-3 bg-red-600 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
                 { totalItems }
               </span>
             ) }
           </Link>
 
-          {user?.role === "admin" && (
+          { user?.role === "admin" && (
             <Link to="/admin" className="hover:text-red-500 transition flex items-center gap-2">Admin</Link>
-          )}
+          ) }
 
-          {/* Auth controls */}
-          {user ? (
+          {/* Auth controls */ }
+          { user ? (
             <>
               <span className="hidden sm:inline text-sm text-gray-100">
-                Welcome, {user.name}
+                Welcome, { user.name }
               </span>
               <button
-                onClick={logout}
+                onClick={ logout }
                 className="bg-white hover:bg-gray-100 text-red-700 px-3 py-1 rounded-full font-semibold text-sm"
               >
                 Logout
@@ -142,7 +137,7 @@ export default function Navbar() {
             </>
           ) : (
             <button
-              onClick={showLoginModal}
+              onClick={ showLoginModal }
               className="bg-white hover:bg-gray-100 text-red-700 px-3 py-1 rounded-full font-semibold text-sm"
             >
               Login
