@@ -44,10 +44,10 @@ describe("🔐 verifyToken Middleware", () => {
     server.close(done);
   });
 
-  test("✅ bypasses check when NODE_ENV=test", async () => {
+  test("✅ bypasses check when NODE_ENV=test and x-test-bypass-auth header is set", async () => {
     process.env.NODE_ENV = "test";
 
-    const res = await request(baseURL).get("/protected");
+    const res = await request(baseURL).get("/protected").set("x-test-bypass-auth", "true");
     expect(res.status).toBe(200);
     expect(res.body.user).toMatchObject({ role: "admin" });
 
@@ -70,7 +70,7 @@ describe("🔐 verifyToken Middleware", () => {
 
     expect(verifyMock).toHaveBeenCalledWith(fakeToken, "supersecret");
     expect(res.status).toBe(200);
-    expect(res.body.user).toEqual({ _id: "123", role: "customer" });
+    expect(res.body.user).toEqual({ _id: "123", id: "123", role: "customer" });
   });
 
   test("🚫 returns 403 if invalid token", async () => {

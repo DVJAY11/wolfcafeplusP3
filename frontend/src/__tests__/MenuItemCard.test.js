@@ -1,3 +1,23 @@
+// ✅ Mock axios at the TOP before any imports that might use it
+jest.mock("axios", () => ({
+  __esModule: true,
+  default: {
+    get: jest.fn(),
+    post: jest.fn(),
+  },
+  get: jest.fn(),
+  post: jest.fn(),
+}));
+
+// Mock GroupOrderContext to avoid axios being loaded
+jest.mock("../context/GroupOrderContext", () => ({
+  useGroupOrder: () => ({
+    groupOrder: null,
+    setGroupOrder: jest.fn(),
+    addItemToGroupOrder: jest.fn(),
+  }),
+}));
+
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import MenuItemCard from "../components/MenuItemCard";
@@ -28,7 +48,7 @@ describe("☕ MenuItemCard Component", () => {
 
   test("renders item name, description, and price", () => {
     useCart.mockReturnValue({ cart: [], ...baseCartFns });
-    render(<MenuItemCard item={mockItem} />);
+    render(<MenuItemCard item={ mockItem } />);
 
     expect(screen.getByText("Latte")).toBeInTheDocument();
     expect(screen.getByText("Smooth espresso with milk")).toBeInTheDocument();
@@ -37,7 +57,7 @@ describe("☕ MenuItemCard Component", () => {
 
   test("shows 'Add to Cart' when item not in cart", () => {
     useCart.mockReturnValue({ cart: [], ...baseCartFns });
-    render(<MenuItemCard item={mockItem} />);
+    render(<MenuItemCard item={ mockItem } />);
 
     const addButton = screen.getByRole("button", { name: /add to cart/i });
     expect(addButton).toBeInTheDocument();
@@ -51,7 +71,7 @@ describe("☕ MenuItemCard Component", () => {
       cart: [{ menuItem: mockItem, quantity: 2 }],
       ...baseCartFns,
     });
-    render(<MenuItemCard item={mockItem} />);
+    render(<MenuItemCard item={ mockItem } />);
 
     expect(screen.getByText("2")).toBeInTheDocument();
     expect(screen.getByText("+")).toBeInTheDocument();
@@ -63,7 +83,7 @@ describe("☕ MenuItemCard Component", () => {
       cart: [{ menuItem: mockItem, quantity: 1 }],
       ...baseCartFns,
     });
-    render(<MenuItemCard item={mockItem} />);
+    render(<MenuItemCard item={ mockItem } />);
 
     fireEvent.click(screen.getByText("+"));
     expect(baseCartFns.incrementItem).toHaveBeenCalledWith(mockItem);
@@ -74,18 +94,18 @@ describe("☕ MenuItemCard Component", () => {
       cart: [{ menuItem: mockItem, quantity: 2 }],
       ...baseCartFns,
     });
-    render(<MenuItemCard item={mockItem} />);
+    render(<MenuItemCard item={ mockItem } />);
 
     fireEvent.click(screen.getByText("−"));
     expect(baseCartFns.decrementItem).toHaveBeenCalledWith(mockItem);
   });
 
-    test("does not call decrement when quantity is 0 (no decrement button shown)", () => {
+  test("does not call decrement when quantity is 0 (no decrement button shown)", () => {
     useCart.mockReturnValue({
       cart: [{ menuItem: mockItem, quantity: 0 }],
       ...baseCartFns,
     });
-    render(<MenuItemCard item={mockItem} />);
+    render(<MenuItemCard item={ mockItem } />);
 
     // It should show "Add to Cart", not the minus button
     expect(screen.getByRole("button", { name: /add to cart/i })).toBeInTheDocument();
@@ -101,7 +121,7 @@ describe("☕ MenuItemCard Component", () => {
     const itemNoImage = { ...mockItem, image: "" };
     useCart.mockReturnValue({ cart: [], ...baseCartFns });
 
-    render(<MenuItemCard item={itemNoImage} />);
+    render(<MenuItemCard item={ itemNoImage } />);
     const img = screen.getByRole("img");
     expect(img).toHaveAttribute("src", "/placeholder.jpg");
   });
@@ -110,7 +130,7 @@ describe("☕ MenuItemCard Component", () => {
     const noNameItem = { ...mockItem, name: "" };
     useCart.mockReturnValue({ cart: [], ...baseCartFns });
 
-    render(<MenuItemCard item={noNameItem} />);
+    render(<MenuItemCard item={ noNameItem } />);
     expect(screen.getByText("Unnamed item")).toBeInTheDocument();
   });
 });
