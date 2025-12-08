@@ -52,7 +52,7 @@ describe("Cart Model", () => {
     const found = await Cart.findById(cart._id).populate("items.menuItem");
 
     expect(found).toBeTruthy();
-    expect(found.user.toString()).toBe(userId.toString());
+    expect(found.user.toString()).toBe(user._id.toString());
     expect(found.items[0].menuItem.name).toBe("Latte");
     expect(found.items[0].quantity).toBe(2);
   });

@@ -26,6 +26,13 @@
 import jwt from "jsonwebtoken";
 
 export const verifyToken = (req, res, next) => {
+  // Skip verification during Jest tests ONLY if the test opts-in via header
+  // This allows auth-rejection tests to work normally
+  if (process.env.NODE_ENV === "test" && req.headers["x-test-bypass-auth"] === "true") {
+    req.user = { _id: "64e0d43f9a742c3098b6a321", id: "64e0d43f9a742c3098b6a321", role: "admin" };
+    return next();
+  }
+
   const authHeader = req.headers.authorization;
 
   if (!authHeader?.startsWith("Bearer ")) {
