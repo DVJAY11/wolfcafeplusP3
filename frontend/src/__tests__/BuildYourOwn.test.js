@@ -20,10 +20,10 @@ jest.mock("react-router-dom", () => ({
 }));
 
 import React from "react";
-import { render, screen, waitFor, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import "@testing-library/jest-dom";
 import BuildYourOwn from "../pages/BuildYourOwn";
 import api from "../api/axios";
-import { useCart } from "../context/CartContext";
 import { AuthContext } from "../context/AuthContext";
 import { useModal } from "../context/ModalContext";
 import { useNavigate } from "react-router-dom";
@@ -82,6 +82,7 @@ describe("🛠️ Build Your Own Page", () => {
 		},
 	];
 
+describe("BuildYourOwn (Meal Builder)", () => {
 	beforeEach(() => {
 		jest.clearAllMocks();
 		useCart.mockReturnValue({ addToCart: mockAddToCart, fetchCart: mockFetchCart });
@@ -90,14 +91,26 @@ describe("🛠️ Build Your Own Page", () => {
 
 		api.get.mockImplementation((url) => {
 			if (url === "/menu?all=true") {
-				return Promise.resolve({ data: sampleMenuItems });
+				return Promise.resolve({
+					data: [
+						{ _id: "d1", name: "Green Tea", price: 3.0, itemGroup: "drink", available: true, description: "Hot tea" },
+						{ _id: "m1", name: "Burger", price: 10.0, itemGroup: "main", available: true },
+						{ _id: "s1", name: "Fries", price: 4.0, itemGroup: "side", available: true },
+					]
+				});
 			}
 			if (url === "/ingredients") {
-				return Promise.resolve({ data: { ingredients: sampleIngredients } });
+				return Promise.resolve({
+					data: {
+						ingredients: [
+							{ _id: "i1", name: "Sugar", price: 0.5, category: "flavoring", applicableFor: ["drink"], available: true },
+							{ _id: "i2", name: "Cheese", price: 1.0, category: "topping", applicableFor: ["main"], available: true },
+						]
+					}
+				});
 			}
 			return Promise.reject(new Error("Unknown URL"));
 		});
-
 		api.post.mockResolvedValue({ data: {} });
 	});
 
@@ -375,6 +388,7 @@ describe("🛠️ Build Your Own Page", () => {
 		await waitFor(() =>
 			expect(screen.getByText("Coffee")).toBeInTheDocument()
 		);
+	};
 
 		// Select Coffee
 		const coffeeOption = screen.getByText("Coffee").closest("div");
