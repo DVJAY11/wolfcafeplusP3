@@ -1,57 +1,64 @@
-☕ WrikiCafe API Documentation
+# ☕ WrikiCafe API Documentation
 
 Base URL (local dev):
 
-http://localhost:5000/api
+* `http://localhost:5000/api`
 
-All routes below are assumed to be prefixed with /api unless stated otherwise.
+> All routes below are assumed to be prefixed with `/api` unless stated otherwise.
 
-🔗 Index
+---
 
-🧱 Base & Health
+## 🔗 Index
 
-👤 Auth Routes
+* 🧱 [Base & Health](#-base--health)
+* 👤 [Auth Routes](#-auth-routes)
+* 🍴 [Menu Routes](#-menu-routes)
+* 🧂 [Ingredient Routes (Build Your Own)](#-ingredient-routes-build-your-own)
+* 🛠️ [Custom Item Routes (Build Your Own)](#-custom-item-routes-build-your-own)
+* 🛒 [Cart Routes](#-cart-routes)
+* 📦 [Order Routes](#-order-routes)
+* 👥 [Group Order Routes (Social Ordering)](#-group-order-routes-social-ordering)
+* 🤖 [Recommendation Routes](#-recommendation-routes)
+* 🧮 [Admin & Analytics Routes](#-admin--analytics-routes)
 
-🍴 Menu Routes
+---
 
-🧂 Ingredient Routes (Build Your Own)
+## 🧱 Base & Health
 
-🛠️ Custom Item Routes (Build Your Own)
+> Mounted in `backend/api/routes/index.js`
 
-🛒 Cart Routes
+| Method | Endpoint      | Description                     | Auth | Role |
+| ------ | ------------- | ------------------------------- | ---- | ---- |
+| `GET`  | `/`           | Base API check message.         | ❌ No | —    |
+| `GET`  | `/admin/ping` | Verifies admin routes are live. | ❌ No | —    |
 
-📦 Order Routes
+---
 
-👥 Group Order Routes (Social Ordering)
+## 👤 Auth Routes
 
-🤖 Recommendation Routes
+**Prefix:** `/api/auth`
 
-🧮 Admin & Analytics Routes
+| Method | Endpoint    | Description                       | Auth  | Role |
+| ------ | ----------- | --------------------------------- | ----- | ---- |
+| `POST` | `/register` | Register a new user account.      | ❌ No  | —    |
+| `POST` | `/login`    | Login and receive a JWT token.    | ❌ No  | —    |
+| `GET`  | `/me`       | Get the currently logged-in user. | ✅ Yes | Any  |
 
-🧱 Base & Health
+---
 
-Mounted in backend/api/routes/index.js
+### `POST /api/auth/register`
 
-Method	Endpoint	Description	Auth	Role
-GET	/	Base API check message.	❌ No	—
-GET	/admin/ping	Verifies admin routes are live.	❌ No	—
-👤 Auth Routes
+**Request**
 
-Prefix: /api/auth
-
-Method	Endpoint	Description	Auth	Role
-POST	/register	Register a new user account.	❌ No	—
-POST	/login	Login and receive a JWT token.	❌ No	—
-GET	/me	Get the currently logged-in user.	✅ Yes	Any
-POST /api/auth/register
-
-Request
-
+```json
 {
   "name": "Alice",
   "email": "alice@example.com",
   "password": "secret123"
 }
+```
+
+---
 
 
 ### `POST /api/auth/login`
