@@ -446,23 +446,4 @@ Returns, for each top product, a per-day quantity series.
 
 ---
 
-## ✅ Notes for Frontend & Testing
 
-* All authenticated routes rely on `verifyToken` middleware and `Authorization: Bearer <token>`.
-
-* Admin-only endpoints also use `allowRoles("admin")`.
-
-* Feature mapping:
-
-  * **Feature 1 – Smart Order**: `/api/recommend/*`
-  * **Feature 2 – Build Your Own**: `/api/ingredients`, `/api/custom-items`, cart & order extensions
-  * **Feature 3 – Social Group Ordering**: `/api/group-orders/*`
-  * **Feature 4 – Order History & Insights**: `/api/orders/history`, `/api/admin/stats*`
-
-* This file is meant to live as `backend/API_DOCUMENTATION.md` (or similar) and render cleanly in GitHub / VS Code.
-
-```
-
-:contentReference[oaicite:0]{index=0}
-::contentReference[oaicite:1]{index=1}
-```
