@@ -3,7 +3,7 @@
 Base URL (local dev):
 
 http://localhost:5000/api
-
+---
 All routes below are assumed to be prefixed with /api unless stated otherwise.
 
 🔗 Index
@@ -29,7 +29,7 @@ All routes below are assumed to be prefixed with /api unless stated otherwise.
 🧮 Admin & Analytics Routes
 
 🧱 Base & Health
-
+---
 Mounted in backend/api/routes/index.js
 
 Method	Endpoint	Description	Auth	Role
@@ -44,7 +44,7 @@ POST	/register	Register a new user account.	❌ No	—
 POST	/login	Login and receive a JWT token.	❌ No	—
 GET	/me	Get the currently logged-in user.	✅ Yes	Any
 POST /api/auth/register
-
+---
 Request
 
 {
@@ -52,7 +52,7 @@ Request
   "email": "alice@example.com",
   "password": "secret123"
 }
-
+---
 
 ### `POST /api/auth/login`
 
