@@ -33,6 +33,8 @@ describe("Cart Model", () => {
       password: "password123",
     });
 
+    userId = new mongoose.Types.ObjectId();
+
     menuItem = await MenuItem.create({
       name: "Latte",
       description: "Smooth espresso with milk",
@@ -50,6 +52,7 @@ describe("Cart Model", () => {
     const found = await Cart.findById(cart._id).populate("items.menuItem");
 
     expect(found).toBeTruthy();
+    expect(found.user.toString()).toBe(userId.toString());
     expect(found.items[0].menuItem.name).toBe("Latte");
     expect(found.items[0].quantity).toBe(2);
   });
@@ -60,6 +63,20 @@ describe("Cart Model", () => {
       items: [{ menuItem: menuItem._id }],
     });
     expect(cart.items[0].quantity).toBe(1);
+  });
+
+  it("should fail if user is missing", async () => {
+    const invalidCart = new Cart({
+      items: [{ menuItem: menuItem._id, quantity: 1 }],
+    });
+    let error;
+    try {
+      await invalidCart.validate();
+    } catch (err) {
+      error = err;
+    }
+    expect(error).toBeDefined();
+    expect(error.errors["user"]).toBeDefined();
   });
 
   it("should fail if menuItem is missing", async () => {
