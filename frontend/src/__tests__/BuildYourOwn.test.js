@@ -462,3 +462,4 @@ describe("🛠️ Build Your Own Page", () => {
 			expect(editButtons.length).toBe(3); // One for drink, main, side
 		});
 	});
+})
