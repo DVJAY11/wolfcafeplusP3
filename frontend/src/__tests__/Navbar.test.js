@@ -1,6 +1,6 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
-import Navbar from "../components/Navbar";
+import Navbar from "../components/Navbar.jsx";
 import { AuthContext } from "../context/AuthContext";
 import { useModal } from "../context/ModalContext";
 import { useCart } from "../context/CartContext";
@@ -21,7 +21,7 @@ jest.mock("../api/axios", () => ({
 const renderNavbar = (authValues) => {
   render(
     <MemoryRouter>
-      <AuthContext.Provider value={authValues}>
+      <AuthContext.Provider value={ authValues }>
         <Navbar />
       </AuthContext.Provider>
     </MemoryRouter>

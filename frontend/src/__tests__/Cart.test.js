@@ -42,29 +42,29 @@ describe("🛒 Cart Component", () => {
     });
   });
 
-//   test("renders cart items and totals", async () => {
-//     render(<Cart />);
+  //   test("renders cart items and totals", async () => {
+  //     render(<Cart />);
 
-//     // wait for main title
-//     expect(await screen.findByText(/Your Cart/i)).toBeInTheDocument();
+  //     // wait for main title
+  //     expect(await screen.findByText(/Your Cart/i)).toBeInTheDocument();
 
-//     // product names
-//     expect(screen.getByText(/Latte/i)).toBeInTheDocument();
-//     expect(screen.getByText(/Muffin/i)).toBeInTheDocument();
+  //     // product names
+  //     expect(screen.getByText(/Latte/i)).toBeInTheDocument();
+  //     expect(screen.getByText(/Muffin/i)).toBeInTheDocument();
 
-//     // look for subtotal & total labels loosely (some may have : or spacing)
-//     expect(screen.getByText(/Subtotal/i)).toBeInTheDocument();
-//     expect(screen.getByText(/Total/i)).toBeInTheDocument();
+  //     // look for subtotal & total labels loosely (some may have : or spacing)
+  //     expect(screen.getByText(/Subtotal/i)).toBeInTheDocument();
+  //     expect(screen.getByText(/Total/i)).toBeInTheDocument();
 
-//     // ensure at least one currency formatted number is rendered
-//     const dollarTexts = Array.from(document.querySelectorAll("span, p"))
-//       .map((el) => el.textContent)
-//       .filter((txt) => txt.includes("$"));
-//     expect(dollarTexts.length).toBeGreaterThan(0);
+  //     // ensure at least one currency formatted number is rendered
+  //     const dollarTexts = Array.from(document.querySelectorAll("span, p"))
+  //       .map((el) => el.textContent)
+  //       .filter((txt) => txt.includes("$"));
+  //     expect(dollarTexts.length).toBeGreaterThan(0);
 
-//     // checkout button
-//     expect(screen.getByRole("button", { name: /Checkout/i })).toBeInTheDocument();
-//   });
+  //     // checkout button
+  //     expect(screen.getByRole("button", { name: /Checkout/i })).toBeInTheDocument();
+  //   });
 
   test("calls increment and decrement handlers correctly", () => {
     render(<Cart />);
@@ -80,22 +80,22 @@ describe("🛒 Cart Component", () => {
     expect(mockRemove).toHaveBeenCalled();
   });
 
-//   test("updates tax and tip inputs and recalculates total visually", async () => {
-//     render(<Cart />);
+  //   test("updates tax and tip inputs and recalculates total visually", async () => {
+  //     render(<Cart />);
 
-//     const taxInput = await screen.findByLabelText(/Tax Rate/i);
-//     const tipInput = await screen.findByLabelText(/Tip/i);
+  //     const taxInput = await screen.findByLabelText(/Tax Rate/i);
+  //     const tipInput = await screen.findByLabelText(/Tip/i);
 
-//     fireEvent.change(taxInput, { target: { value: "0.1" } });
-//     fireEvent.change(tipInput, { target: { value: "5" } });
+  //     fireEvent.change(taxInput, { target: { value: "0.1" } });
+  //     fireEvent.change(tipInput, { target: { value: "5" } });
 
-//     expect(taxInput.value).toBe("0.1");
-//     expect(tipInput.value).toBe("5");
+  //     expect(taxInput.value).toBe("0.1");
+  //     expect(tipInput.value).toBe("5");
 
-//     // confirm a total element still exists (avoid exact numeric expectation)
-//     const totalLabel = screen.getByText(/Total/i);
-//     expect(totalLabel).toBeInTheDocument();
-//   });
+  //     // confirm a total element still exists (avoid exact numeric expectation)
+  //     const totalLabel = screen.getByText(/Total/i);
+  //     expect(totalLabel).toBeInTheDocument();
+  //   });
 
   test("shows loading state during checkout", async () => {
     api.post.mockResolvedValueOnce({ data: { order: { _id: "abc", total: 20 } } });
@@ -142,5 +142,124 @@ describe("🛒 Cart Component", () => {
     render(<Cart />);
     expect(screen.getByText(/Your cart is empty/i)).toBeInTheDocument();
     expect(screen.getByText(/Add some items/i)).toBeInTheDocument();
+  });
+
+  // ==================== NEW TESTS FOR COVERAGE ====================
+
+  test("renders cart items and displays subtotal/total", () => {
+    render(<Cart />);
+
+    // Product names should be visible
+    expect(screen.getByText(/Latte/i)).toBeInTheDocument();
+    expect(screen.getByText(/Muffin/i)).toBeInTheDocument();
+
+    // Summary labels
+    expect(screen.getByText(/Subtotal:/i)).toBeInTheDocument();
+    expect(screen.getByText(/Tax \(8%\):/i)).toBeInTheDocument();
+
+    // Checkout button
+    expect(screen.getByRole("button", { name: /Checkout/i })).toBeInTheDocument();
+  });
+
+  test("displays meal bundle when items have same mealGroupId", () => {
+    const bundledCart = [
+      {
+        _id: "b1",
+        quantity: 1,
+        mealGroupId: "bundle123",
+        menuItem: { _id: "m1", name: "Coffee", price: 3.0 },
+      },
+      {
+        _id: "b2",
+        quantity: 1,
+        mealGroupId: "bundle123",
+        menuItem: { _id: "m2", name: "Sandwich", price: 5.0 },
+      },
+    ];
+
+    useCart.mockReturnValue({
+      cart: bundledCart,
+      removeFromCart: jest.fn(),
+      incrementItem: jest.fn(),
+      decrementItem: jest.fn(),
+      clearCart: jest.fn(),
+    });
+
+    render(<Cart />);
+
+    // Should show Meal Bundle header
+    expect(screen.getByText(/Meal Bundle/i)).toBeInTheDocument();
+    // Both items in bundle
+    expect(screen.getByText(/Coffee/i)).toBeInTheDocument();
+    expect(screen.getByText(/Sandwich/i)).toBeInTheDocument();
+  });
+
+  test("calculates subtotal including customizations", () => {
+    const cartWithCustomizations = [
+      {
+        _id: "c1",
+        quantity: 1,
+        menuItem: { _id: "m1", name: "Latte", price: 4.0 },
+        customizations: [
+          { name: "Vanilla", price: 0.5 },
+          { name: "Extra Shot", price: 0.75 },
+        ],
+      },
+    ];
+
+    useCart.mockReturnValue({
+      cart: cartWithCustomizations,
+      removeFromCart: jest.fn(),
+      incrementItem: jest.fn(),
+      decrementItem: jest.fn(),
+      clearCart: jest.fn(),
+    });
+
+    render(<Cart />);
+
+    // Item should be displayed
+    expect(screen.getByText(/Latte/i)).toBeInTheDocument();
+    // Customizations should be shown
+    expect(screen.getByText(/Vanilla/i)).toBeInTheDocument();
+    expect(screen.getByText(/Extra Shot/i)).toBeInTheDocument();
+  });
+
+  test("tip input updates and affects total", () => {
+    render(<Cart />);
+
+    // Find tip input
+    const tipInput = screen.getByRole("spinbutton");
+    expect(tipInput).toBeInTheDocument();
+
+    // Change tip value
+    fireEvent.change(tipInput, { target: { value: "5" } });
+    expect(tipInput).toHaveValue(5);
+  });
+
+  test("displays customizations in cart item with prices", () => {
+    const cartWithCustomizations = [
+      {
+        _id: "c1",
+        quantity: 1,
+        menuItem: { _id: "m1", name: "Coffee", price: 3.0 },
+        customizations: [
+          { name: "Oat Milk", price: 0.75 },
+        ],
+      },
+    ];
+
+    useCart.mockReturnValue({
+      cart: cartWithCustomizations,
+      removeFromCart: jest.fn(),
+      incrementItem: jest.fn(),
+      decrementItem: jest.fn(),
+      clearCart: jest.fn(),
+    });
+
+    render(<Cart />);
+
+    // Customization name and price should be visible
+    expect(screen.getByText(/Oat Milk/i)).toBeInTheDocument();
+    expect(screen.getByText(/\$0.75/i)).toBeInTheDocument();
   });
 });
