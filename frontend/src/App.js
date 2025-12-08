@@ -31,7 +31,7 @@ function PageWrapper({ children }) {
   const isHome = location.pathname === "/";
   const isBuildYourOwn = location.pathname === "/build-your-own";
 
-  return <div className={isHome || isBuildYourOwn ? "" : "pt-24"}>{children}</div>;
+  return <div className={ isHome || isBuildYourOwn ? "" : "pt-24" }>{ children }</div>;
 }
 
 function App() {
@@ -39,71 +39,40 @@ function App() {
     <AuthProvider>
       <ModalProvider>
         <CartProvider>
-          <Router>
-            <PageWrapper>
-              <Navbar />
-              <Routes>
-                {/* 🌐 Public routes */}
-                <Route path="/" element={<Home />} />
-                <Route path="/menu" element={<Menu />} />
-                <Route path="/cart" element={<Cart />} />
-                <Route path="/about" element={<AboutUs />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/smart-order" element={ <SmartOrder /> } />
-
-                {/* 🔒 Authenticated (non-admin) protected routes */}
-                <Route element={<ProtectedRoute />}>
-                  {/* example placeholder; you can add user-only routes here */}
-                  {/* <Route path="/profile" element={<UserProfile />} /> */}
-                </Route>
-
-                {/* 🧑‍💼 Admin-only protected routes */}
-                <Route element={<AdminProtectedRoute />}>
-                  <Route path="/admin" element={<AdminLayout />}>
-                    <Route index element={<AdminDashboard />} />
-                    <Route path="orders" element={<ManageOrders />} />
-                    <Route path="items" element={<ManageItems />} />
-                    <Route path="ingredients" element={<ManageIngredients />} />
-                    <Route path="sales-stats" element={<AdminSalesStats />} />
-                  </Route>
-                </Route>
-              </Routes>
-            </PageWrapper>
-          </Router>
-          {/* 👉 Wrap the app tree with GroupOrderProvider */}
           <GroupOrderProvider>
             <Router>
               <PageWrapper>
                 <Navbar />
                 <Routes>
-                  {/* 🌐 Public routes */}
-                  <Route path="/" element={<Home />} />
-                  <Route path="/menu" element={<Menu />} />
-                  <Route path="/cart" element={<Cart />} />
-                  <Route path="/about" element={<AboutUs />} />
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/build-your-own" element={<BuildYourOwn />} />
-                  
-                  {/* 🔒 Authenticated (non-admin) protected routes */}
-                  <Route element={<ProtectedRoute />}>
-                    {/* 👉 Group Order routes should require login */}
-                    <Route path="/group-order" element={<GroupOrder />} />
+                  {/* 🌐 Public routes */ }
+                  <Route path="/" element={ <Home /> } />
+                  <Route path="/menu" element={ <Menu /> } />
+                  <Route path="/cart" element={ <Cart /> } />
+                  <Route path="/about" element={ <AboutUs /> } />
+                  <Route path="/login" element={ <Login /> } />
+                  <Route path="/smart-order" element={ <SmartOrder /> } />
+                  <Route path="/build-your-own" element={ <BuildYourOwn /> } />
+
+                  {/* 🔒 Authenticated (non-admin) protected routes */ }
+                  <Route element={ <ProtectedRoute /> }>
+                    <Route path="/group-order" element={ <GroupOrder /> } />
                     <Route
                       path="/group-order/:shareCode"
-                      element={<GroupOrderSession />}
+                      element={ <GroupOrderSession /> }
                     />
-                    <Route path="/my-group-orders" element={<MyGroupOrders />} />
-                    {/* example placeholder; you can add user-only routes here */}
-                    {/* <Route path="/profile" element={<UserProfile />} /> */}
+                    <Route path="/my-group-orders" element={ <MyGroupOrders /> } />
+                    {/* example placeholder; you can add user-only routes here */ }
+                    {/* <Route path="/profile" element={<UserProfile />} /> */ }
                   </Route>
 
-                  {/* 🧑‍💼 Admin-only protected routes */}
-                  <Route element={<AdminProtectedRoute />}>
-                    <Route path="/admin" element={<AdminLayout />}>
-                      <Route index element={<AdminDashboard />} />
-                      <Route path="orders" element={<ManageOrders />} />
-                      <Route path="items" element={<ManageItems />} />
-                      <Route path="ingredients" element={<ManageIngredients />} />
+                  {/* 🧑‍💼 Admin-only protected routes */ }
+                  <Route element={ <AdminProtectedRoute /> }>
+                    <Route path="/admin" element={ <AdminLayout /> }>
+                      <Route index element={ <AdminDashboard /> } />
+                      <Route path="orders" element={ <ManageOrders /> } />
+                      <Route path="items" element={ <ManageItems /> } />
+                      <Route path="ingredients" element={ <ManageIngredients /> } />
+                      <Route path="sales-stats" element={ <AdminSalesStats /> } />
                     </Route>
                   </Route>
                 </Routes>
