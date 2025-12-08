@@ -126,12 +126,11 @@ Admins can:
 
 ## 6. References & Links
 
-- 🌐 **Frontend Demo (if hosted):** *coming soon*
 - 🌐 **Backend API:** `http://localhost:5000/api`
 - 📦 **GitHub Repo:** https://github.com/RishithaRamesh/WolfCafePlus (Original Source)
 - 📄 **API Documentation:** See `API_DOCUMENTATION.md`
 - 📘 **README:** Includes installation, scripts, and project setup.
-- 🎥 **Demo Video:** *Attach link if provided*
+- 🎥 **Demo Video:** https://youtu.be/O3_w81HXtyw
 
 ---
 
