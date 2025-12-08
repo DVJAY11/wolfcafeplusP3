@@ -5,7 +5,7 @@ Base URL (local dev):
 
 - `http://localhost:5000/api`
 
-> All routes below are assumed to be prefixed with `/api`.
+> All routes below are assumed to be prefixed with `/api` unless stated otherwise.
 
 ---
 
@@ -26,26 +26,28 @@ Base URL (local dev):
 
 ## 🧱 Base & Health
 
-| Method | Endpoint    | Description              | Auth | Role |
-|--------|-------------|--------------------------|------|------|
-| `GET`  | `/`         | Base API check message.  | ❌ No | —    |
-| `GET`  | `/admin/ping` | Verifies admin routes are live. | ❌ No | — |
+> Mounted in `backend/api/routes/index.js`
 
-> Mounted via the main router (`index.js`).
+| Method | Endpoint       | Description                     | Auth | Role |
+|--------|----------------|---------------------------------|------|------|
+| `GET`  | `/`            | Base API check message.         | ❌ No | —    |
+| `GET`  | `/admin/ping`  | Verifies admin routes are live. | ❌ No | —    |
 
-
+---
 
 ## 👤 Auth Routes
 
 **Prefix:** `/api/auth`
 
-| Method | Endpoint        | Description                            | Auth | Role |
-|--------|-----------------|----------------------------------------|------|------|
-| `POST` | `/register`     | Register a new user account.           | ❌ No | —    |
-| `POST` | `/login`        | Login and receive a JWT token.         | ❌ No | —    |
-| `GET`  | `/me`           | Get the currently logged-in user.      | ✅ Yes | Any  |
+| Method | Endpoint    | Description                       | Auth | Role |
+|--------|-------------|-----------------------------------|------|------|
+| `POST` | `/register` | Register a new user account.      | ❌ No | —    |
+| `POST` | `/login`    | Login and receive a JWT token.    | ❌ No | —    |
+| `GET`  | `/me`       | Get the currently logged-in user. | ✅ Yes | Any |
 
-**Request – `POST /api/auth/register`**
+### `POST /api/auth/register`
+
+**Request**
 
 ```json
 {
@@ -70,7 +72,9 @@ Base URL (local dev):
 }
 ```
 
-**Request – `POST /api/auth/login`**
+### `POST /api/auth/login`
+
+**Request**
 
 ```json
 {
@@ -79,49 +83,49 @@ Base URL (local dev):
 }
 ```
 
-Returns a similar payload with `token` and `user`.
+Returns the same payload shape as `/register` (`token` + `user`).
 
-> JWT is sent in `Authorization: Bearer <token>` for all authenticated routes.
+> For all authenticated routes, send JWT as:
+> `Authorization: Bearer <token>`
 
 ---
 
 ## 🍴 Menu Routes
 
 **Prefix:** `/api/menu`
+Model: `MenuItem` (`name`, `price`, `category`, `available`, `prepTime`, etc.)
 
-The `MenuItem` model includes fields like: `name`, `price`, `category`, `available`, `prepTime`, etc.
+| Method   | Endpoint       | Description                                                                   | Auth  | Role  |
+| -------- | -------------- | ----------------------------------------------------------------------------- | ----- | ----- |
+| `GET`    | `/`            | Fetch all **available** menu items. Use `?all=true` to include archived ones. | ❌ No  | —     |
+| `POST`   | `/`            | Create a new menu item.                                                       | ✅ Yes | Admin |
+| `PUT`    | `/:id`         | Update an existing menu item.                                                 | ✅ Yes | Admin |
+| `DELETE` | `/:id`         | Hard delete a menu item.                                                      | ✅ Yes | Admin |
+| `PATCH`  | `/:id/archive` | Soft-delete (set `available=false`, remove from carts).                       | ✅ Yes | Admin |
+| `PATCH`  | `/:id/restore` | Restore an archived item (`available=true`).                                  | ✅ Yes | Admin |
 
-| Method   | Endpoint                | Description                                                                          | Auth  | Role  |
-| -------- | ----------------------- | ------------------------------------------------------------------------------------ | ----- | ----- |
-| `GET`    | `/api/menu`             | Fetch all **available** menu items. Use `?all=true` to include archived/unavailable. | ❌ No  | —     |
-| `POST`   | `/api/menu`             | Create a new menu item.                                                              | ✅ Yes | Admin |
-| `PUT`    | `/api/menu/:id`         | Update an existing menu item.                                                        | ✅ Yes | Admin |
-| `DELETE` | `/api/menu/:id`         | Hard delete a menu item.                                                             | ✅ Yes | Admin |
-| `PATCH`  | `/api/menu/:id/archive` | Soft-delete (set `available=false` and remove from carts).                           | ✅ Yes | Admin |
-| `PATCH`  | `/api/menu/:id/restore` | Restore an archived item (`available=true`).                                         | ✅ Yes | Admin |
+**Query params for `GET /api/menu`**
 
-**Query params for `GET /api/menu`:**
-
-* `all=true` → returns all items regardless of `available` flag.
+* `all=true` – include unavailable / archived items.
 
 ---
 
 ## 🧂 Ingredient Routes (Build Your Own)
 
 **Prefix:** `/api/ingredients`
+Model: `Ingredient` (`name`, `price`, `category` = `base` / `topping` / `flavoring`, `allergens[]`, `dietaryTags[]`, `available`).
 
-The `Ingredient` model holds building blocks for custom items:
-`name`, `price`, `category` (`base`/`topping`/`flavoring`), `allergens[]`, `dietaryTags[]`, `available`.
+| Method   | Endpoint    | Description                                                                | Auth  | Role  |
+| -------- | ----------- | -------------------------------------------------------------------------- | ----- | ----- |
+| `GET`    | `/`         | Get all available ingredients.                                             | ❌ No  | —     |
+| `POST`   | `/`         | Create a new ingredient.                                                   | ✅ Yes | Admin |
+| `PUT`    | `/:id`      | Update an existing ingredient.                                             | ✅ Yes | Admin |
+| `DELETE` | `/:id`      | Delete an ingredient.                                                      | ✅ Yes | Admin |
+| `POST`   | `/validate` | Validate a set of ingredient IDs + dietary restrictions, and compute cost. | ✅ Yes | Any   |
 
-| Method   | Endpoint                    | Description                                                               | Auth  | Role  |
-| -------- | --------------------------- | ------------------------------------------------------------------------- | ----- | ----- |
-| `GET`    | `/api/ingredients`          | Get all available ingredients.                                            | ❌ No  | —     |
-| `POST`   | `/api/ingredients`          | Create a new ingredient.                                                  | ✅ Yes | Admin |
-| `PUT`    | `/api/ingredients/:id`      | Update an ingredient.                                                     | ✅ Yes | Admin |
-| `DELETE` | `/api/ingredients/:id`      | Delete an ingredient.                                                     | ✅ Yes | Admin |
-| `POST`   | `/api/ingredients/validate` | Validate a set of ingredients + dietary restrictions (server-side check). | ✅ Yes | Any   |
+### `POST /api/ingredients/validate`
 
-**`POST /api/ingredients/validate` – example body**
+**Request**
 
 ```json
 {
@@ -130,25 +134,35 @@ The `Ingredient` model holds building blocks for custom items:
 }
 ```
 
-Returns compatibility info, warnings, and computed price.
+**Response (shape)**
+
+```json
+{
+  "ok": true,
+  "totalPrice": 220,
+  "warnings": ["Contains soy"],
+  "violations": []
+}
+```
 
 ---
 
 ## 🛠️ Custom Item Routes (Build Your Own)
 
 **Prefix:** `/api/custom-items`
+Model: `CustomItem` (`user`, `name`, `baseItem`, `ingredients[]`, `dietaryRestrictions[]`, `totalPrice`, `savedAt`).
 
-These routes manage **saved custom builds** for a logged-in user. All require authentication.
+All routes require auth.
 
-| Method   | Endpoint                | Description                                      | Auth  | Role |
-| -------- | ----------------------- | ------------------------------------------------ | ----- | ---- |
-| `POST`   | `/api/custom-items`     | Save a new custom item for the current user.     | ✅ Yes | Any  |
-| `GET`    | `/api/custom-items`     | Get all saved custom items for the current user. | ✅ Yes | Any  |
-| `GET`    | `/api/custom-items/:id` | Get one custom item by ID (must belong to user). | ✅ Yes | Any  |
-| `PUT`    | `/api/custom-items/:id` | Update fields of a saved custom item.            | ✅ Yes | Any  |
-| `DELETE` | `/api/custom-items/:id` | Delete a saved custom item.                      | ✅ Yes | Any  |
+| Method   | Endpoint | Description                                      | Auth  | Role |
+| -------- | -------- | ------------------------------------------------ | ----- | ---- |
+| `POST`   | `/`      | Save a new custom item for the current user.     | ✅ Yes | Any  |
+| `GET`    | `/`      | Get all saved custom items for the current user. | ✅ Yes | Any  |
+| `GET`    | `/:id`   | Get one custom item by ID (must belong to user). | ✅ Yes | Any  |
+| `PUT`    | `/:id`   | Update a saved custom item.                      | ✅ Yes | Any  |
+| `DELETE` | `/:id`   | Delete a saved custom item.                      | ✅ Yes | Any  |
 
-**Example – `POST /api/custom-items`**
+### `POST /api/custom-items` (example)
 
 ```json
 {
@@ -167,21 +181,15 @@ Response includes populated `baseItem` and `ingredients`.
 ## 🛒 Cart Routes
 
 **Prefix:** `/api/cart`
+Cart is always scoped to the **logged-in user** (one active cart per user).
 
-Cart is always scoped to the **logged-in user**.
+| Method   | Endpoint   | Description                                                           | Auth  | Role     |
+| -------- | ---------- | --------------------------------------------------------------------- | ----- | -------- |
+| `GET`    | `/`        | Get the user's current cart (with populated `items.menuItem`).        | ✅ Yes | Customer |
+| `POST`   | `/`        | Add or update items in the cart (batch-friendly).                     | ✅ Yes | Customer |
+| `DELETE` | `/:itemId` | Remove a cart line item by its **cart item `_id`** (`itemId` in URL). | ✅ Yes | Customer |
 
-| Method   | Endpoint                | Description                                                                                | Auth  | Role     |
-| -------- | ----------------------- | ------------------------------------------------------------------------------------------ | ----- | -------- |
-| `GET`    | `/api/cart`             | Get the user's current cart with populated `items.menuItem`.                               | ✅ Yes | Customer |
-| `POST`   | `/api/cart`             | Add/update items in cart (supports batching, customizations, meal groups).                 | ✅ Yes | Customer |
-| `DELETE` | `/api/cart/:menuItemId` | Remove a specific item **by its cart item `_id`** (param is called `menuItemId` in route). | ✅ Yes | Customer |
-
-**Important behaviour:**
-
-* Standard items with **no customizations** stack by quantity.
-* Items with **customizations** or belonging to a **mealGroupId** are added as separate lines (no stacking). 
-
-**Example – `POST /api/cart` (single item)**
+### `POST /api/cart` (single item example)
 
 ```json
 {
@@ -190,66 +198,108 @@ Cart is always scoped to the **logged-in user**.
       "menuItem": "64menuItemId",
       "quantity": 2,
       "customizations": [],
-      "mealGroupId": null
+      "mealGroupId": null,
+      "customItem": null
     }
   ]
 }
 ```
+
+**Behaviour notes**
+
+* Plain items (no customizations, no `mealGroupId`, no `customItem`) **stack** by quantity.
+* Items with customizations, meal groups, or `customItem` are treated as separate rows.
 
 ---
 
 ## 📦 Order Routes
 
 **Prefix:** `/api/orders`
+Model: `Order` (`user`, `items[]`, `subtotal`, `tax`, `tip`, `total`, `status`, `createdAt` etc.)
 
-| Method  | Endpoint              | Description                                                           | Auth  | Role     |
-| ------- | --------------------- | --------------------------------------------------------------------- | ----- | -------- |
-| `POST`  | `/api/orders`         | Create a new order from the current user's cart.                      | ✅ Yes | Customer |
-| `GET`   | `/api/orders`         | Get **all orders** (optionally filter by status, etc.).               | ✅ Yes | Admin    |
-| `GET`   | `/api/orders/history` | Get **order history** for the logged-in user (most recent first).     | ✅ Yes | Customer |
-| `PATCH` | `/api/orders/:id`     | Update order status (`pending`, `in_progress`, `ready`, `completed`). | ✅ Yes | Admin    |
+| Method  | Endpoint   | Description                                                                 | Auth  | Role     |
+| ------- | ---------- | --------------------------------------------------------------------------- | ----- | -------- |
+| `POST`  | `/`        | Create a new order from the current user's cart.                            | ✅ Yes | Customer |
+| `GET`   | `/`        | Get **all orders** (for admin dashboard; supports filters in controller).   | ✅ Yes | Admin    |
+| `GET`   | `/history` | Get **order history** for the logged-in user (reverse chronological).       | ✅ Yes | Customer |
+| `PATCH` | `/:id`     | Update order status (`pending`, `in_progress`, `ready`, `completed`, etc.). | ✅ Yes | Admin    |
 
-**Order creation response** includes `items`, `subtotal`, `tax`, `tip`, `total`, `status`, etc.
+**Order creation response example**
+
+```json
+{
+  "message": "Order created",
+  "order": {
+    "_id": "64orderId",
+    "user": "64userId",
+    "items": [
+      {
+        "menuItem": {
+          "_id": "64menuItemId",
+          "name": "Iced Latte",
+          "price": 180
+        },
+        "quantity": 2,
+        "lineTotal": 360
+      }
+    ],
+    "subtotal": 360,
+    "tax": 36,
+    "tip": 20,
+    "total": 416,
+    "status": "pending",
+    "createdAt": "2025-12-08T..."
+  }
+}
+```
 
 ---
 
 ## 👥 Group Order Routes (Social Ordering)
 
 **Prefix:** `/api/group-orders`
+Model: `GroupOrder` (`creator`, `participants[]`, `status`, `shareCode`, `splitType`, `subtotal`, `tax`, `tip`, `total`, `expiresAt`).
 
-These routes power the **Social Group Ordering** feature (Feature 3).
+Participants array:
 
-`GroupOrder` schema includes: `creator`, `participants[]`, `status` (`open` / `completed`), `shareCode`, `splitType`, `subtotal`, `tax`, `tip`, `total`, `expiresAt`.
+```js
+{
+  user: ObjectId,          // ref User
+  items: [                 // items added by this user
+    {
+      menuItem: ObjectId,  // ref MenuItem
+      quantity: Number,
+      price: Number
+    }
+  ],
+  joinedAt: Date
+}
+```
 
-| Method   | Endpoint                              | Description                                                                                        | Auth  | Role         |
-| -------- | ------------------------------------- | -------------------------------------------------------------------------------------------------- | ----- | ------------ |
-| `GET`    | `/api/group-orders/mine`              | Get all group orders where the current user is a participant or creator.                           | ✅ Yes | Any          |
-| `POST`   | `/api/group-orders`                   | Create a new group order. Generates a unique `shareCode`.                                          | ✅ Yes | Any          |
-| `GET`    | `/api/group-orders/:shareCode`        | Get group order details using a `shareCode`.                                                       | ✅ Yes | Any          |
-| `POST`   | `/api/group-orders/:shareCode/join`   | Join a group order via `shareCode`.                                                                | ✅ Yes | Any          |
-| `POST`   | `/api/group-orders/:id/items`         | Add an item to the current user's bucket within a group order (by `_id`).                          | ✅ Yes | Any          |
-| `DELETE` | `/api/group-orders/:id/items/:itemId` | Remove one item (by its subdocument `_id`) from current user’s bucket.                             | ✅ Yes | Any          |
-| `DELETE` | `/api/group-orders/:id/leave`         | Leave a group order (removes the user from `participants`).                                        | ✅ Yes | Any          |
-| `POST`   | `/api/group-orders/:id/finalize`      | Creator finalizes; creates individual `Order` docs for participants and completes the group order. | ✅ Yes | Creator only |
+| Method   | Endpoint             | Description                                                                                | Auth  | Role         |
+| -------- | -------------------- | ------------------------------------------------------------------------------------------ | ----- | ------------ |
+| `GET`    | `/mine`              | Get all group orders where the current user is creator or participant.                     | ✅ Yes | Any          |
+| `POST`   | `/`                  | Create a new group order (generates unique `shareCode`, sets `expiresAt` ~2 hours).        | ✅ Yes | Any          |
+| `GET`    | `/:shareCode`        | Get group order details via public `shareCode`.                                            | ✅ Yes | Any          |
+| `POST`   | `/:shareCode/join`   | Join a group order via `shareCode`.                                                        | ✅ Yes | Any          |
+| `POST`   | `/:id/items`         | Add an item to the **current user's** bucket in the group order (`id` = GroupOrder `_id`). | ✅ Yes | Any          |
+| `DELETE` | `/:id/items/:itemId` | Remove one item (subdocument `_id`) from current user's bucket.                            | ✅ Yes | Any          |
+| `DELETE` | `/:id/leave`         | Leave a group order (removes user from `participants`, may auto-complete if empty).        | ✅ Yes | Any          |
+| `POST`   | `/:id/finalize`      | Creator finalizes group order and auto-creates per-user `Order` documents.                 | ✅ Yes | Creator only |
 
-**Key rules:**
+### `POST /api/group-orders` (create)
 
-* All group-order routes require a valid JWT (`verifyToken`). 
-* `createGroupOrder` initializes `status="open"` and sets a 2-hour `expiresAt`.
-* `addItemToGroupOrder` validates `menuItemId`, ensures `status === "open"` and not expired. 
-* `finalizeGroupOrder` (creator only) recalculates totals, then creates one `Order` per participant with proportional tax/tip. 
-
-**Example – `POST /api/group-orders`**
+**Request**
 
 ```json
 {
-  "splitType": "itemized",
+  "splitType": "itemized",  // or "equal"
   "tax": 20,
   "tip": 30
 }
 ```
 
-Response includes:
+**Response (example)**
 
 ```json
 {
@@ -265,72 +315,88 @@ Response includes:
 }
 ```
 
+### `POST /api/group-orders/:id/items` (add item)
+
+**Request**
+
+```json
+{
+  "menuItemId": "64menuItemId",
+  "quantity": 2
+}
+```
+
+Adds the item under the current user in `participants[].items`.
+
+### `POST /api/group-orders/:id/finalize` (finalize)
+
+Recomputes `subtotal`, `tax`, `tip`, `total`, marks `status="completed"` and creates individual `Order` docs per participant. Split logic:
+
+* `"equal"` → total divided equally between participants.
+* `"itemized"` → each participant pays for their own items + proportional tax & tip.
+
 ---
 
 ## 🤖 Recommendation Routes
 
 **Prefix:** `/api/recommend`
+Backed by `recommendationController.js` + `UserPreferences` model.
 
-These power **Smart Order (Feature 1)** and advanced “For You” recommendations.
-
-| Method | Endpoint                               | Description                                                 | Auth  | Role |
-| ------ | -------------------------------------- | ----------------------------------------------------------- | ----- | ---- |
-| `GET`  | `/api/recommend/smart-suggestions`     | Budget + time-based smart suggestions (no auth required).   | ❌ No  | —    |
-| `GET`  | `/api/recommend/personalized`          | Personalized ML-powered recommendations for logged-in user. | ✅ Yes | Any  |
-| `GET`  | `/api/recommend/similar-items/:itemId` | Get items similar to a given `itemId`.                      | ❌ No  | —    |
-| `POST` | `/api/recommend/update-preferences`    | Manually trigger rebuilding the user’s preference profile.  | ✅ Yes | Any  |
+| Method | Endpoint                 | Description                                      | Auth  | Role |
+| ------ | ------------------------ | ------------------------------------------------ | ----- | ---- |
+| `GET`  | `/smart-suggestions`     | Budget + time-based smart suggestions.           | ❌ No  | —    |
+| `GET`  | `/personalized`          | Personalized recommendations for logged-in user. | ✅ Yes | Any  |
+| `GET`  | `/similar-items/:itemId` | Get items similar to a given `itemId`.           | ❌ No  | —    |
+| `POST` | `/update-preferences`    | Rebuild the current user's preference profile.   | ✅ Yes | Any  |
 
 ### `GET /api/recommend/smart-suggestions`
 
-**Query params:**
+**Query params**
 
-* `budget` (required, number) – max price.
-* `timeAvailable` (required, number, minutes) – max `prepTime`.
+* `budget` (number, required) – max price.
+* `timeAvailable` (number, required, minutes) – max `prepTime`.
 
-Returns items where `price ≤ budget` and `prepTime ≤ timeAvailable`, sorted by popularity with reason tags like `"Great Value"`, `"Under Budget"`, `"Quick Prep"`, `"Ready in Time"`.
+Filters menu items by `price <= budget` and `prepTime <= timeAvailable`, sorts by popularity (order count), and returns top items with reason tags like `"Under Budget"`, `"Quick Prep"`, `"Great Value"`.
 
 ### `GET /api/recommend/personalized`
 
-**Query params:**
+**Query params**
 
-* `budget` (required, number)
-* `timeAvailable` (required, number, minutes)
+* `budget` (required)
+* `timeAvailable` (required)
 * `limit` (optional, default `10`)
 
-Uses hybrid ML (`getHybridRecommendations`) based on **user history + menu metadata**.
+Uses hybrid scoring (`getHybridRecommendations`) combining:
+
+* User’s order history,
+* Menu metadata (category, tags),
+* Popularity signals.
 
 ### `GET /api/recommend/similar-items/:itemId`
 
-**Query params:**
-
-* `limit` (optional, default `5`)
-
-Returns a list of items similar to the given `itemId`.
+Returns a list of similar items (same category / flavour profile) for “You may also like…” UI.
 
 ### `POST /api/recommend/update-preferences`
 
-Rebuilds the logged-in user’s profile using `buildUserProfile` and returns confirmation + profile snapshot.
+Rebuilds the logged-in user's `UserPreferences` document and returns a confirmation and profile snapshot.
 
 ---
 
 ## 🧮 Admin & Analytics Routes
 
 **Prefix:** `/api/admin`
+Controllers: `adminController.js`, `adminStatsController.js`
+All routes except `/admin/ping` require `role = admin`.
 
-These are **admin-only** analytics routes, intended for dashboards / charts.
+| Method | Endpoint                | Description                                                              | Auth  | Role  |
+| ------ | ----------------------- | ------------------------------------------------------------------------ | ----- | ----- |
+| `GET`  | `/ping`                 | Simple health-check for admin routes.                                    | ❌ No  | —     |
+| `GET`  | `/stats`                | High-level platform stats (users, orders, revenue, etc.).                | ✅ Yes | Admin |
+| `GET`  | `/stats/items-sold`     | Best-selling items with quantities and per-item revenue.                 | ✅ Yes | Admin |
+| `GET`  | `/stats/time-series`    | Daily time series of orders, revenue, and items sold.                    | ✅ Yes | Admin |
+| `GET`  | `/stats/product-trends` | Product-wise trends over time (top N products, suitable for line chart). | ✅ Yes | Admin |
 
-| Method | Endpoint                          | Description                                                        | Auth  | Role  |
-| ------ | --------------------------------- | ------------------------------------------------------------------ | ----- | ----- |
-| `GET`  | `/api/admin/ping`                 | Health-check for admin routes.                                     | ❌ No  | —     |
-| `GET`  | `/api/admin/stats`                | High-level platform stats (users, orders, revenue, etc.).          | ✅ Yes | Admin |
-| `GET`  | `/api/admin/stats/items-sold`     | Best-selling items with quantities + revenue per item.             | ✅ Yes | Admin |
-| `GET`  | `/api/admin/stats/time-series`    | Daily time series (orders, revenue, items sold) over a date range. | ✅ Yes | Admin |
-| `GET`  | `/api/admin/stats/product-trends` | Product-wise trends over time (top N products).                    | ✅ Yes | Admin |
-
-### `GET /api/admin/stats/items-sold`
-
-* Aggregates all **non-pending orders**.
-* Returns: totals + per-item breakdown:
+### `GET /api/admin/stats/items-sold` (shape)
 
 ```json
 {
@@ -350,33 +416,53 @@ These are **admin-only** analytics routes, intended for dashboards / charts.
 
 ### `GET /api/admin/stats/time-series`
 
-**Query params:**
+**Query params**
 
 * `days` (optional, default `30`)
 
-Returns an array of day-level stats (`date`, `orders`, `revenue`, `itemsSold`) with missing dates filled as zeros – ideal for line charts.
+Returns per-day stats:
+
+```json
+[
+  {
+    "date": "2025-12-01",
+    "orders": 10,
+    "revenue": 6500,
+    "itemsSold": 40
+  }
+]
+```
+
+Missing dates are filled with zeros for smooth charts.
 
 ### `GET /api/admin/stats/product-trends`
 
-**Query params:**
+**Query params**
 
 * `days` (optional, default `30`)
-* `top` (optional, default `5`) – number of top products.
+* `top` (optional, default `5`)
 
-Returns, for each top product, a time series of `{ date, quantity }` to build multi-line product trend charts.
+Returns, for each top product, a per-day quantity series.
 
 ---
 
 ## ✅ Notes for Frontend & Testing
 
-* All authenticated routes rely on `verifyToken` and expect `Authorization: Bearer <token>`.
-* Admin-only routes also use `allowRoles("admin")`.
-* Group order + recommendation endpoints are ready to be hit from:
+* All authenticated routes rely on `verifyToken` middleware and `Authorization: Bearer <token>`.
 
-  * `/smart-order` (Smart Order page)
-  * `/build-your-own` (custom items with ingredients)
-  * `/group-order` and `/group-order/:shareCode`
-  * `/admin/insights` for charts (items-sold, time-series, product-trends).
+* Admin-only endpoints also use `allowRoles("admin")`.
 
+* Feature mapping:
 
-That’s the complete, consolidated API doc for all four features + your new endpoints. You can just paste this into `API_DOCUMENTATION.md` in your repo.
+  * **Feature 1 – Smart Order**: `/api/recommend/*`
+  * **Feature 2 – Build Your Own**: `/api/ingredients`, `/api/custom-items`, cart & order extensions
+  * **Feature 3 – Social Group Ordering**: `/api/group-orders/*`
+  * **Feature 4 – Order History & Insights**: `/api/orders/history`, `/api/admin/stats*`
+
+* This file is meant to live as `backend/API_DOCUMENTATION.md` (or similar) and render cleanly in GitHub / VS Code.
+
+```
+
+:contentReference[oaicite:0]{index=0}
+::contentReference[oaicite:1]{index=1}
+```
