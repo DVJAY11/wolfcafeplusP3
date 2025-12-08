@@ -4,7 +4,7 @@
 [![Build](https://github.com/rishitharamesh/wolfcafeplus/actions/workflows/build.yml/badge.svg)]
 [![Lint](https://github.com/rishitharamesh/wolfcafeplus/actions/workflows/lint.yml/badge.svg)]
 [![Prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://prettier.io/)
-[![codecov](https://codecov.io/gh/rishitharamesh/wolfcafeplus/branch/main/graph/badge.svg)](https://codecov.io/gh/rishitharamesh/wolfcafeplus)
+[![codecov](https://codecov.io/gh/DVJAY11/wolfcafeplusP3/graph/badge.svg?token=0V60J6NUHG)](https://codecov.io/gh/DVJAY11/wolfcafeplusP3)
 ![React](https://img.shields.io/badge/React-19.2.0-61dafb?logo=react&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-4.0-646cff?logo=vite&logoColor=white)
 ![Vitest](https://img.shields.io/badge/Vitest-0.28.0-6DA83F?logo=vitest&logoColor=white)
