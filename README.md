@@ -13,43 +13,64 @@
 ![formatter](https://img.shields.io/badge/formatter-Prettier-ff69b4)
 > A smarter, personalized, and social campus food-ordering system for NC State University. || Funfact: WrikiCafe+ is derived from the Sanskrit word vṛkī (वृकी) meaning she-wolf ||
 
-## 🎯 Mission Statement
+## 📌 Overview
 
-Campus cafés often struggle with **long queues, manual order tracking, and miscommunication** between customers and staff.  
-**wrikicafe** addresses this challenge by building a **real-time, smart food ordering system** that enhances both the user experience and operational efficiency.
+WrikiCafe+ provides:
 
-- **Why:** Students and faculty waste valuable time waiting in line or wondering when their order will be ready.  
-- **What:** A role-based, web-based ordering system with instant order notifications, personalized menu recommendations, and admin analytics.  
-- **So What:** This system **reduces waiting time, streamlines kitchen operations, and builds a connected campus café experience**.  
-  Every order is tracked from “pending” to “ready,” and customers receive instant notifications when their drink or meal is ready for pickup — saving time and boosting satisfaction.
+- A simple, intuitive ordering interface for students  
+- A full admin panel for menu, ingredients, and order flow  
+- Real-time order notifications  
+- Social group ordering  
+- Build-your-own custom item flow  
+- Order history and insights (extended features)
+
+Originally built for **NCSU**, the system is adaptable for any university café environment.
+
+---
+
+## ✨ Features
+
+### User Features
+- Browse/search menu items  
+- Personalized build-your-own café items  
+- Add to cart & checkout  
+- Real-time order-ready alerts  
+- Social Group Ordering (create, join, split, finalize)  
+- Order history & reorder option  
+
+### Admin Features
+- Manage menu items  
+- Manage ingredients  
+- Track active orders  
+- Trigger pickup notifications  
+- View café performance (extended)
+
+---
+
+## 🛠️ Tech Stack
+
+### Frontend
+- React  
+- Vite  
+- React Router  
+- React Testing Library  
+- TailwindCSS  
+- Axios  
+
+### Backend
+- Node.js  
+- Express  
+- MongoDB (Mongoose)  
+- Cloudinary  
+- JWT Authentication  
+- Nodemailer  
+- Jest + Supertest  
+
+---
 
 ## 📽️ Demo Video (2 min)
 🎥 **[Watch the Version 1 Demo](https://drive.google.com/file/d/1rF2Nw3hMvygaE4dNnrE-KzBt6mMmS3zz/view?usp=drive_link)**  
 _Showing new functionality: role-based permissions, order tracking, and real-time pickup notifications._
-
-
-## 🚀 Project Overview
-**WrikiCafe+** is a full-stack MERN (MongoDB, Express, React, Node.js) web application designed to modernize and simplify campus café operations. Our mission is to make campus dining **smarter, faster, and more personalized** — for students, staff, and administrators alike.
-
-| **Role** | **Capabilities** |
-|-----------|------------------|
-| 🧑‍💼 **Admin** | • Manage menu inventory<br>• Track all orders<br>• Set tax rates<br>• Access live analytics dashboard<br>• Update order statuses in real time<br>• Oversee pickup workflow |
-| 🧑‍🎓 **Customer** | • Browse menu<br>• Add items to cart<br>• Checkout securely<br>• Receive email alerts when orders are ready |
-
-
-## 🧩 Key Features (v1)
-- ✅ Role-based access for Admins and Users  
-- ✅ Menu management (CRUD)  
-- ✅ Customer orders with tip and tax computation  
-- ✅ Real-time order fulfillment and pickup notifications  
-- ✅ Cloud image uploads via Cloudinary  
-- ✅ Secure JWT authentication + Express middleware  
-
-
-## 📈 Next Milestones (v2)
-- [ ] AI-powered “Surprise Me” recommendations  
-- [ ] Group shared cart and budget/time optimizers  
-- [ ] Accessibility audit and performance enhancements  
 
 
 ## ⚙️ Installation & Setup
@@ -67,10 +88,10 @@ npm run dev
 > Requires MongoDB URI in `.env`.
 
 
-## 👥 Team 16
+## 👥 Team 19
 | Name | GitHub |
 |------|--------|
-| **Digvijay Sonvane** | [@Digvijay Sonvane](https://github.com/DVJAY11) |
+| **Digvijay Sonvane** | [@DigvijaySonvane](https://github.com/DVJAY11) |
 | **Suyesh Jadhav** |  [@SuyeshJadhav](https://github.com/SuyeshJadhav) |
 | **Vanaja Agarwal** |  [@VanajaAgarwal](https://github.com/PositivelyBookish) |
 
