@@ -1,6 +1,6 @@
 # MIT License
 
-Copyright (c) 2025 Rishitha Ramesh, Rujuta Budke, and Dhruva Kamble
+Copyright (c) 2025 Vanaja Agarwal, Suyesh Jadhav, and Digvijay SOnvane
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
