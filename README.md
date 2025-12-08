@@ -68,25 +68,118 @@ Originally built for **NCSU**, the system is adaptable for any university café 
 
 ---
 
-## 📽️ Demo Video (2 min)
-🎥 **[Watch the Version 1 Demo](https://drive.google.com/file/d/1rF2Nw3hMvygaE4dNnrE-KzBt6mMmS3zz/view?usp=drive_link)**  
-_Showing new functionality: role-based permissions, order tracking, and real-time pickup notifications._
+## 📽️ Demo Video (4 min)
+🎥 **[Watch the Demo]([https://drive.google.com/file/d/1rF2Nw3hMvygaE4dNnrE-KzBt6mMmS3zz/view?usp=drive_link](https://discord.com/channels/1416897055791779880/1416903107706753146/1447622614477574365))**  
+_
+---
 
+## 📦 Installation
 
-## ⚙️ Installation & Setup
-See [INSTALL.md](INSTALL.md) for full setup details.  
-In short:
+### 1. Clone Repository
+```bash
+git clone https://github.com/rishitharamesh/wolfcafeplus.git
+cd wolfcafeplus
+````
+
+### 2. Install Backend Dependencies
 
 ```bash
-git clone https://github.com/RishithaRamesh/WrikiCafeplus.git
-cd WrikiCafeplus
-npm install && cd frontend && npm install
+npm install
+```
+
+### 3. Install Frontend Dependencies
+
+```bash
+cd frontend
+npm install
+```
+
+---
+
+## 🚀 Running the Application
+
+### Start Backend (default port 5000)
+
+```bash
 npm run dev
+```
+
+### Start Frontend (default port 3000)
+
+```bash
+npm run dev
+```
+
+---
+
+## 📁 Project Structure
+
+```
+backend/
+  api/
+    controllers/
+    middleware/
+    models/
+    routes/
+    utils/
+  server.js
+
+frontend/
+  src/
+    api/
+    components/
+    context/
+    pages/
+    utils/
+```
+
+---
+
+## 🔑 Environment Variables
+
+Create `.env` inside **backend/**:
+
+```
+MONGO_URI=<your_mongo_uri>
+JWT_SECRET=<your_jwt_secret>
+
+CLOUDINARY_CLOUD_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
+
+EMAIL_USER=
+EMAIL_PASS=
 ```
 
 > Default backend runs on port 5000, frontend on 3000.  
 > Requires MongoDB URI in `.env`.
 
+---
+
+## 🧪 Testing
+
+### Backend Tests
+
+```bash
+npm test
+```
+
+### Frontend Tests
+
+```bash
+cd frontend
+npm test
+```
+
+Coverage includes:
+
+* Authentication
+* Protected Routes
+* Group Ordering
+* Build-Your-Own flow
+* Controllers & API responses
+
+---
 
 ## 👥 Team 19
 | Name | GitHub |
