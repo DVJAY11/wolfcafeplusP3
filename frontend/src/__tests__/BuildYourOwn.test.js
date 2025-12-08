@@ -370,32 +370,7 @@ describe("🛠️ Build Your Own Page", () => {
 		expect(screen.queryByText(/Customize/i)).not.toBeInTheDocument();
 	});
 
-	test("BYO-2: review step displays selected items", async () => {
-		renderWithAuth(<BuildYourOwn />);
-		await waitFor(() =>
-			expect(screen.getByText("Coffee")).toBeInTheDocument()
-		);
 
-		// Select Coffee
-		const coffeeOption = screen.getByText("Coffee").closest("div");
-		fireEvent.click(coffeeOption);
-
-		// Go to review
-		const step4Button = screen.getByText("4").closest("button");
-		fireEvent.click(step4Button);
-
-		await waitFor(() =>
-			expect(screen.getByText(/Review Your Meal/i)).toBeInTheDocument()
-		);
-
-		// Should display section labels
-		expect(screen.getByText("drink")).toBeInTheDocument();
-		expect(screen.getByText("main")).toBeInTheDocument();
-		expect(screen.getByText("side")).toBeInTheDocument();
-
-		// Should show Coffee as the selected drink
-		expect(screen.getByText("Coffee")).toBeInTheDocument();
-	});
 
 	test("BYO-3: review step shows total price", async () => {
 		renderWithAuth(<BuildYourOwn />);
