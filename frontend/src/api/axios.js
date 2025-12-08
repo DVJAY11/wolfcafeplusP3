@@ -29,4 +29,43 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+// ---------- SOCIAL GROUP ORDERING API HELPERS ----------
+
+// Create a new group order (host starts a session)
+export const createGroupOrder = () => {
+  return api.post("/group-orders");
+};
+
+// Join existing group order via share code
+export const joinGroupOrder = (shareCode) => {
+  return api.post(`/group-orders/${shareCode}/join`);
+};
+
+// Fetch full group order details by share code
+export const getGroupOrderByShareCode = (shareCode) => {
+  return api.get(`/group-orders/${shareCode}`);
+};
+
+// Add an item to the current user's items in a group order
+// payload shape: { menuItemId, quantity, customizations }
+export const addToGroupOrder = (groupOrderId, payload) => {
+  return api.post(`/group-orders/${groupOrderId}/items`, payload);
+};
+
+// Remove an item (only your own) from a group order
+export const removeFromGroupOrder = (groupOrderId, itemId) => {
+  return api.delete(`/group-orders/${groupOrderId}/items/${itemId}`);
+};
+
+// Finalize / checkout the group order (creator only)
+export const finalizeGroupOrder = (groupOrderId) => {
+  return api.post(`/group-orders/${groupOrderId}/finalize`);
+};
+
+// Leave a group order
+export const leaveGroupOrder = (groupOrderId) => {
+  return api.delete(`/group-orders/${groupOrderId}/leave`);
+};
+
+
 export default api;

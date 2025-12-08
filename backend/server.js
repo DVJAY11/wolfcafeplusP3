@@ -12,11 +12,12 @@ import menuRoutes from "./api/routes/menuRoutes.js";
 import cartRoutes from "./api/routes/cartRoutes.js";
 import orderRoutes from "./api/routes/orderRoutes.js";
 import adminRoutes from "./api/routes/adminRoutes.js";
+import recommendationRoutes from "./api/routes/recommendationRoutes.js";
 import ingredientRoutes from "./api/routes/ingredientRoutes.js";
 import customItemRoutes from "./api/routes/customItemRoutes.js";
 
 dotenv.config();
-
+console.log("MONGO_URI from .env:", process.env.MONGO_URI);
 const app = express();
 app.use(express.json());
 
@@ -50,6 +51,7 @@ app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/recommend", recommendationRoutes);
 app.use("/api/ingredients", ingredientRoutes);
 app.use("/api/custom-items", customItemRoutes);
 

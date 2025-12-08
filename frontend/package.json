@@ -2,7 +2,7 @@
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://localhost:5000",
+  "proxy": "http://localhost:8000",
   "dependencies": {
     "@fontsource/graduate": "^5.2.7",
     "@tailwindcss/postcss": "^4.1.16",
@@ -47,9 +47,21 @@
     ]
   },
   "devDependencies": {
+    "@babel/core": "^7.28.5",
+    "@babel/preset-env": "^7.28.5",
+    "@babel/preset-react": "^7.28.5",
     "autoprefixer": "^10.4.21",
+    "babel-jest": "^30.2.0",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.18"
+  },
+  "jest": {
+    "moduleNameMapper": {
+      "^axios$": "<rootDir>/node_modules/axios/dist/node/axios.cjs"
+    },
+    "transformIgnorePatterns": [
+      "node_modules/(?!(axios|lucide-react|react-icons)/)"
+    ]
   },
   "lint": "eslint ."
 }
