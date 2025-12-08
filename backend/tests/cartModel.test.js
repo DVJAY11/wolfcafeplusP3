@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import Cart from "../api/models/Cart.js";
 import MenuItem from "../api/models/MenuItem.js";
+import User from "../api/models/User.js";
 
 let mongoServer;
 
@@ -18,10 +19,19 @@ afterAll(async () => {
 
 describe("Cart Model", () => {
   let menuItem;
+  let user;
 
   beforeEach(async () => {
     await Cart.deleteMany();
     await MenuItem.deleteMany();
+    await User.deleteMany();
+
+    // Create a test user (required by Cart model)
+    user = await User.create({
+      name: "Test User",
+      email: "testuser@example.com",
+      password: "password123",
+    });
 
     menuItem = await MenuItem.create({
       name: "Latte",
@@ -33,6 +43,7 @@ describe("Cart Model", () => {
 
   it("should create a cart with a valid menuItem reference", async () => {
     const cart = await Cart.create({
+      user: user._id,
       items: [{ menuItem: menuItem._id, quantity: 2 }],
     });
 
@@ -45,6 +56,7 @@ describe("Cart Model", () => {
 
   it("should default quantity to 1 when not specified", async () => {
     const cart = await Cart.create({
+      user: user._id,
       items: [{ menuItem: menuItem._id }],
     });
     expect(cart.items[0].quantity).toBe(1);
@@ -52,6 +64,7 @@ describe("Cart Model", () => {
 
   it("should fail if menuItem is missing", async () => {
     const invalidCart = new Cart({
+      user: user._id,
       items: [{ quantity: 1 }],
     });
     let error;
@@ -66,6 +79,7 @@ describe("Cart Model", () => {
 
   it("should fail if quantity < 1", async () => {
     const invalidCart = new Cart({
+      user: user._id,
       items: [{ menuItem: menuItem._id, quantity: 0 }],
     });
     await expect(invalidCart.validate()).rejects.toThrow();

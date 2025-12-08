@@ -1,297 +1,363 @@
+// 🚨 Mock axios before importing component
+jest.mock("../api/axios", () => ({
+	get: jest.fn(),
+	post: jest.fn(),
+}));
+
+// Mock MenuItemCard
+jest.mock("../components/MenuItemCard", () => (props) => (
+	<div data-testid={ `menu-item-${props.item._id}` }>
+		<span>{ props.item.name }</span>
+		<span>${ props.item.price }</span>
+		<button onClick={ props.onAdd }>Add to Cart</button>
+		{ props.children }
+	</div>
+));
+
+// Mock useCart hook
+jest.mock("../context/CartContext", () => ({
+	useCart: jest.fn(),
+}));
+
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import SmartOrder from "../pages/SmartOrder";
-import { CartProvider } from "../context/CartContext";
-import AuthProvider from "../context/AuthContext";
+import { AuthContext } from "../context/AuthContext";
 import api from "../api/axios";
+import { useCart } from "../context/CartContext";
 
-// Mock the api module
-jest.mock("../api/axios");
-
-const renderWithProviders = (component) => {
+// Helper to render with providers
+const renderWithProviders = (component, { user = null } = {}) => {
 	return render(
-		<AuthProvider>
-			<CartProvider>
-				<BrowserRouter>
-					{ component }
-				</BrowserRouter>
-			</CartProvider>
-		</AuthProvider>
+		<AuthContext.Provider value={ { user, login: jest.fn(), logout: jest.fn() } }>
+			<BrowserRouter>
+				{ component }
+			</BrowserRouter>
+		</AuthContext.Provider>
 	);
 };
 
-describe("SmartOrder Page", () => {
+describe("🍽️ SmartOrder Page", () => {
+	const mockAddToCart = jest.fn();
+
 	beforeEach(() => {
 		jest.clearAllMocks();
-	});
-
-	it("renders the Smart Order page with title", () => {
-		renderWithProviders(<SmartOrder />);
-		expect(screen.getByText(/Smart Order/i)).toBeInTheDocument();
-		expect(screen.getByText(/Find the perfect meal/i)).toBeInTheDocument();
-	});
-
-	it("displays budget slider with default value", () => {
-		renderWithProviders(<SmartOrder />);
-		expect(screen.getByText(/Budget: \$50/i)).toBeInTheDocument();
-	});
-
-	it("displays time selector with default value", () => {
-		renderWithProviders(<SmartOrder />);
-		expect(screen.getByText(/Time Available: 15 mins/i)).toBeInTheDocument();
-	});
-
-	it("updates budget when slider is moved", () => {
-		renderWithProviders(<SmartOrder />);
-		const budgetSlider = screen.getAllByRole("slider")[0];
-
-		fireEvent.change(budgetSlider, { target: { value: "100" } });
-		expect(screen.getByText(/Budget: \$100/i)).toBeInTheDocument();
-	});
-
-	it("updates time when slider is moved", () => {
-		renderWithProviders(<SmartOrder />);
-		const timeSlider = screen.getAllByRole("slider")[1];
-
-		fireEvent.change(timeSlider, { target: { value: "30" } });
-		expect(screen.getByText(/Time Available: 30 mins/i)).toBeInTheDocument();
-	});
-
-	it("displays Find Suggestions button", () => {
-		renderWithProviders(<SmartOrder />);
-		expect(screen.getByRole("button", { name: /Find Suggestions/i })).toBeInTheDocument();
-	});
-
-	it("shows loading state when fetching suggestions", async () => {
-		api.get.mockImplementation(() => new Promise(() => { })); // Never resolves
-
-		renderWithProviders(<SmartOrder />);
-		const findButton = screen.getByRole("button", { name: /Find Suggestions/i });
-
-		fireEvent.click(findButton);
-
-		await waitFor(() => {
-			expect(screen.getByText(/Finding.../i)).toBeInTheDocument();
+		useCart.mockReturnValue({
+			addToCart: mockAddToCart,
+			cart: [],
+			fetchCart: jest.fn(),
 		});
 	});
 
-	it("displays suggestions when API call succeeds", async () => {
-		const mockSuggestions = [
-			{
-				_id: "1",
-				name: "Latte",
-				price: 4.5,
-				category: "Coffee",
-				prepTime: 5,
-				reasons: ["Quick Prep", "Great Value"],
-				image: "/latte.jpg"
-			},
-			{
-				_id: "2",
-				name: "Burger",
-				price: 8.0,
-				category: "Food",
-				prepTime: 15,
-				reasons: ["Under Budget"],
-				image: "/burger.jpg"
-			}
-		];
-
-		api.get.mockResolvedValue({
-			data: {
-				suggestions: mockSuggestions,
-				count: 2,
-				budget: 50,
-				timeAvailable: 15
-			}
+	// ================== INITIAL RENDER TESTS ==================
+	describe("Initial Render (Guest User)", () => {
+		test("renders page title for guest users", () => {
+			renderWithProviders(<SmartOrder />);
+			expect(screen.getByText("Smart Suggestions")).toBeInTheDocument();
 		});
 
-		renderWithProviders(<SmartOrder />);
-		const findButton = screen.getByRole("button", { name: /Find Suggestions/i });
-
-		fireEvent.click(findButton);
-
-		await waitFor(() => {
-			expect(screen.getByText("Latte")).toBeInTheDocument();
-			expect(screen.getByText("Burger")).toBeInTheDocument();
-		});
-	});
-
-	it("displays reason tags for suggestions", async () => {
-		const mockSuggestions = [
-			{
-				_id: "1",
-				name: "Quick Snack",
-				price: 3.0,
-				category: "Snacks",
-				prepTime: 5,
-				reasons: ["Quick Prep", "Great Value"],
-				image: "/snack.jpg"
-			}
-		];
-
-		api.get.mockResolvedValue({
-			data: {
-				suggestions: mockSuggestions,
-				count: 1,
-				budget: 50,
-				timeAvailable: 15
-			}
+		test("displays guest user description", () => {
+			renderWithProviders(<SmartOrder />);
+			expect(screen.getByText(/Tell us your constraints/i)).toBeInTheDocument();
 		});
 
-		renderWithProviders(<SmartOrder />);
-		const findButton = screen.getByRole("button", { name: /Find Suggestions/i });
+		test("shows login prompt for guest users", () => {
+			renderWithProviders(<SmartOrder />);
+			expect(screen.getByText(/Log in for personalized recommendations/i)).toBeInTheDocument();
+		});
 
-		fireEvent.click(findButton);
+		test("renders budget slider with default value of $20", () => {
+			renderWithProviders(<SmartOrder />);
+			expect(screen.getByText("$20")).toBeInTheDocument();
+		});
 
-		await waitFor(() => {
-			expect(screen.getByText(/✓ Quick Prep/i)).toBeInTheDocument();
-			expect(screen.getByText(/✓ Great Value/i)).toBeInTheDocument();
+		test("renders time slider with default value of 30 min", () => {
+			renderWithProviders(<SmartOrder />);
+			expect(screen.getByText("30 min")).toBeInTheDocument();
+		});
+
+		test("renders Find My Meal button", () => {
+			renderWithProviders(<SmartOrder />);
+			expect(screen.getByRole("button", { name: /Find My Meal/i })).toBeInTheDocument();
+		});
+
+		test("does NOT show Refresh Preferences button for guests", () => {
+			renderWithProviders(<SmartOrder />);
+			expect(screen.queryByText(/Refresh Preferences/i)).not.toBeInTheDocument();
+		});
+
+		test("shows initial state message before search", () => {
+			renderWithProviders(<SmartOrder />);
+			expect(screen.getByText(/Adjust the sliders above/i)).toBeInTheDocument();
 		});
 	});
 
-	it("displays prep time badge", async () => {
-		const mockSuggestions = [
-			{
-				_id: "1",
-				name: "Coffee",
-				price: 3.0,
-				category: "Drinks",
-				prepTime: 10,
-				reasons: ["Quick Prep"],
-				image: "/coffee.jpg"
-			}
-		];
+	// ================== LOGGED-IN USER TESTS ==================
+	describe("Initial Render (Logged-in User)", () => {
+		const mockUser = { id: "user123", name: "Test User" };
 
-		api.get.mockResolvedValue({
-			data: {
-				suggestions: mockSuggestions,
-				count: 1,
-				budget: 50,
-				timeAvailable: 15
-			}
+		test("renders personalized title for logged-in users", () => {
+			renderWithProviders(<SmartOrder />, { user: mockUser });
+			expect(screen.getByText("Personalized For You")).toBeInTheDocument();
 		});
 
-		renderWithProviders(<SmartOrder />);
-		const findButton = screen.getByRole("button", { name: /Find Suggestions/i });
+		test("displays personalized description", () => {
+			renderWithProviders(<SmartOrder />, { user: mockUser });
+			expect(screen.getByText(/Our AI analyzes your taste/i)).toBeInTheDocument();
+		});
 
-		fireEvent.click(findButton);
+		test("shows Refresh Preferences button for logged-in users", () => {
+			renderWithProviders(<SmartOrder />, { user: mockUser });
+			expect(screen.getByText(/Refresh Preferences/i)).toBeInTheDocument();
+		});
 
-		await waitFor(() => {
-			expect(screen.getByText(/⏱️ 10 min prep/i)).toBeInTheDocument();
+		test("does NOT show login prompt for logged-in users", () => {
+			renderWithProviders(<SmartOrder />, { user: mockUser });
+			expect(screen.queryByText(/Log in for personalized/i)).not.toBeInTheDocument();
 		});
 	});
 
-	it("displays no suggestions message when results are empty", async () => {
-		api.get.mockResolvedValue({
-			data: {
-				suggestions: [],
-				count: 0,
-				budget: 50,
-				timeAvailable: 15
-			}
+	// ================== SLIDER INTERACTION TESTS ==================
+	describe("Slider Interactions", () => {
+		test("updates budget when slider is moved", () => {
+			renderWithProviders(<SmartOrder />);
+			const sliders = screen.getAllByRole("slider");
+			const budgetSlider = sliders[0];
+
+			fireEvent.change(budgetSlider, { target: { value: "35" } });
+			expect(screen.getByText("$35")).toBeInTheDocument();
 		});
 
-		renderWithProviders(<SmartOrder />);
-		const findButton = screen.getByRole("button", { name: /Find Suggestions/i });
+		test("updates time when slider is moved", () => {
+			renderWithProviders(<SmartOrder />);
+			const sliders = screen.getAllByRole("slider");
+			const timeSlider = sliders[1];
 
-		fireEvent.click(findButton);
-
-		await waitFor(() => {
-			expect(screen.getByText(/No Suggestions Found/i)).toBeInTheDocument();
-			expect(screen.getByText(/Try adjusting your budget/i)).toBeInTheDocument();
-		});
-	});
-
-	it("displays error message when API call fails", async () => {
-		const errorMessage = "Failed to load suggestions";
-		api.get.mockRejectedValue({
-			response: {
-				data: {
-					message: errorMessage
-				}
-			}
-		});
-
-		renderWithProviders(<SmartOrder />);
-		const findButton = screen.getByRole("button", { name: /Find Suggestions/i });
-
-		fireEvent.click(findButton);
-
-		await waitFor(() => {
-			expect(screen.getByText(errorMessage)).toBeInTheDocument();
+			fireEvent.change(timeSlider, { target: { value: "45" } });
+			expect(screen.getByText("45 min")).toBeInTheDocument();
 		});
 	});
 
-	it("calls API with correct parameters", async () => {
-		api.get.mockResolvedValue({
-			data: {
-				suggestions: [],
-				count: 0,
-				budget: 75,
-				timeAvailable: 25
-			}
+	// ================== API CALL TESTS (GUEST) ==================
+	describe("API Calls (Guest User)", () => {
+		test("calls smart-suggestions endpoint for guest users", async () => {
+			api.get.mockResolvedValue({ data: { suggestions: [] } });
+
+			renderWithProviders(<SmartOrder />);
+			fireEvent.click(screen.getByRole("button", { name: /Find My Meal/i }));
+
+			await waitFor(() => {
+				expect(api.get).toHaveBeenCalledWith("/recommend/smart-suggestions", {
+					params: { budget: 20, timeAvailable: 30, limit: 12 }
+				});
+			});
 		});
 
-		renderWithProviders(<SmartOrder />);
+		test("shows loading state when fetching", async () => {
+			api.get.mockImplementation(() => new Promise(() => { }));
 
-		// Change budget and time
-		const budgetSlider = screen.getAllByRole("slider")[0];
-		const timeSlider = screen.getAllByRole("slider")[1];
+			renderWithProviders(<SmartOrder />);
+			fireEvent.click(screen.getByRole("button", { name: /Find My Meal/i }));
 
-		fireEvent.change(budgetSlider, { target: { value: "75" } });
-		fireEvent.change(timeSlider, { target: { value: "25" } });
-
-		const findButton = screen.getByRole("button", { name: /Find Suggestions/i });
-		fireEvent.click(findButton);
-
-		await waitFor(() => {
-			expect(api.get).toHaveBeenCalledWith("/recommend/smart-suggestions", {
-				params: { budget: 75, timeAvailable: 25 }
+			await waitFor(() => {
+				expect(screen.getByText(/Analyzing/i)).toBeInTheDocument();
 			});
 		});
 	});
 
-	it("disables button while loading", async () => {
-		api.get.mockImplementation(() => new Promise(resolve => setTimeout(resolve, 100)));
+	// ================== API CALL TESTS (LOGGED-IN) ==================
+	describe("API Calls (Logged-in User)", () => {
+		const mockUser = { id: "user123", name: "Test User" };
 
-		renderWithProviders(<SmartOrder />);
-		const findButton = screen.getByRole("button", { name: /Find Suggestions/i });
+		test("calls personalized endpoint for logged-in users", async () => {
+			api.get.mockResolvedValue({ data: { recommendations: [] } });
 
-		fireEvent.click(findButton);
+			renderWithProviders(<SmartOrder />, { user: mockUser });
+			fireEvent.click(screen.getByRole("button", { name: /Find My Meal/i }));
 
-		expect(findButton).toBeDisabled();
-	});
-
-	it("shows initial state message before first search", () => {
-		renderWithProviders(<SmartOrder />);
-		expect(screen.getByText(/Ready to Find Your Perfect Meal/i)).toBeInTheDocument();
-	});
-
-	it("displays suggestion count", async () => {
-		const mockSuggestions = [
-			{ _id: "1", name: "Item 1", price: 5, prepTime: 10, reasons: [], image: "/1.jpg" },
-			{ _id: "2", name: "Item 2", price: 6, prepTime: 12, reasons: [], image: "/2.jpg" },
-			{ _id: "3", name: "Item 3", price: 7, prepTime: 15, reasons: [], image: "/3.jpg" }
-		];
-
-		api.get.mockResolvedValue({
-			data: {
-				suggestions: mockSuggestions,
-				count: 3,
-				budget: 50,
-				timeAvailable: 15
-			}
+			await waitFor(() => {
+				expect(api.get).toHaveBeenCalledWith("/recommend/personalized", {
+					params: { budget: 20, timeAvailable: 30, limit: 12 }
+				});
+			});
 		});
 
-		renderWithProviders(<SmartOrder />);
-		const findButton = screen.getByRole("button", { name: /Find Suggestions/i });
+		test("calls update-preferences endpoint when refreshing", async () => {
+			api.post.mockResolvedValue({ data: {} });
+			api.get.mockResolvedValue({ data: { recommendations: [] } });
 
-		fireEvent.click(findButton);
+			renderWithProviders(<SmartOrder />, { user: mockUser });
+			fireEvent.click(screen.getByText(/Refresh Preferences/i));
 
-		await waitFor(() => {
-			expect(screen.getByText(/3 Suggestions Found/i)).toBeInTheDocument();
+			await waitFor(() => {
+				expect(api.post).toHaveBeenCalledWith("/recommend/update-preferences");
+			});
+		});
+	});
+
+	// ================== RESULTS DISPLAY TESTS ==================
+	describe("Results Display", () => {
+		const mockSuggestions = [
+			{
+				_id: "item1",
+				name: "Latte",
+				price: 4.5,
+				prepTime: 5,
+				reasons: ["Quick Prep", "Great Value"],
+			},
+			{
+				_id: "item2",
+				name: "Burger",
+				price: 8.0,
+				prepTime: 15,
+				reasons: ["Under Budget"],
+				score: 0.85,
+			},
+		];
+
+		test("displays suggestions when API returns results", async () => {
+			api.get.mockResolvedValue({ data: { suggestions: mockSuggestions } });
+
+			renderWithProviders(<SmartOrder />);
+			fireEvent.click(screen.getByRole("button", { name: /Find My Meal/i }));
+
+			await waitFor(() => {
+				expect(screen.getByText("Latte")).toBeInTheDocument();
+				expect(screen.getByText("Burger")).toBeInTheDocument();
+			});
+		});
+
+		test("displays Top Recommendations heading", async () => {
+			api.get.mockResolvedValue({ data: { suggestions: mockSuggestions } });
+
+			renderWithProviders(<SmartOrder />);
+			fireEvent.click(screen.getByRole("button", { name: /Find My Meal/i }));
+
+			await waitFor(() => {
+				expect(screen.getByText("Top Recommendations")).toBeInTheDocument();
+			});
+		});
+
+		test("displays item count badge", async () => {
+			api.get.mockResolvedValue({ data: { suggestions: mockSuggestions } });
+
+			renderWithProviders(<SmartOrder />);
+			fireEvent.click(screen.getByRole("button", { name: /Find My Meal/i }));
+
+			await waitFor(() => {
+				expect(screen.getByText("2 items found")).toBeInTheDocument();
+			});
+		});
+
+		test("displays reason tags for items", async () => {
+			api.get.mockResolvedValue({ data: { suggestions: mockSuggestions } });
+
+			renderWithProviders(<SmartOrder />);
+			fireEvent.click(screen.getByRole("button", { name: /Find My Meal/i }));
+
+			await waitFor(() => {
+				expect(screen.getByText("Quick Prep")).toBeInTheDocument();
+				expect(screen.getByText("Great Value")).toBeInTheDocument();
+			});
+		});
+
+		test("displays score badge for personalized items", async () => {
+			api.get.mockResolvedValue({ data: { suggestions: mockSuggestions } });
+
+			renderWithProviders(<SmartOrder />);
+			fireEvent.click(screen.getByRole("button", { name: /Find My Meal/i }));
+
+			await waitFor(() => {
+				expect(screen.getByText("85%")).toBeInTheDocument();
+			});
+		});
+	});
+
+	// ================== EMPTY STATE TESTS ==================
+	describe("Empty State", () => {
+		test("displays no matches message when results are empty", async () => {
+			api.get.mockResolvedValue({ data: { suggestions: [] } });
+
+			renderWithProviders(<SmartOrder />);
+			fireEvent.click(screen.getByRole("button", { name: /Find My Meal/i }));
+
+			await waitFor(() => {
+				expect(screen.getByText("No matches found")).toBeInTheDocument();
+			});
+		});
+
+		test("shows reset filters button", async () => {
+			api.get.mockResolvedValue({ data: { suggestions: [] } });
+
+			renderWithProviders(<SmartOrder />);
+			fireEvent.click(screen.getByRole("button", { name: /Find My Meal/i }));
+
+			await waitFor(() => {
+				expect(screen.getByText("Reset filters to defaults")).toBeInTheDocument();
+			});
+		});
+
+		test("reset filters button updates sliders", async () => {
+			api.get.mockResolvedValue({ data: { suggestions: [] } });
+
+			renderWithProviders(<SmartOrder />);
+			fireEvent.click(screen.getByRole("button", { name: /Find My Meal/i }));
+
+			await waitFor(() => {
+				expect(screen.getByText("Reset filters to defaults")).toBeInTheDocument();
+			});
+
+			fireEvent.click(screen.getByText("Reset filters to defaults"));
+
+			// Should reset to 30 and 45
+			expect(screen.getByText("$30")).toBeInTheDocument();
+			expect(screen.getByText("45 min")).toBeInTheDocument();
+		});
+	});
+
+	// ================== ERROR HANDLING TESTS ==================
+	describe("Error Handling", () => {
+		test("displays error message when API fails", async () => {
+			api.get.mockRejectedValue({
+				response: { data: { message: "Server error" } }
+			});
+
+			renderWithProviders(<SmartOrder />);
+			fireEvent.click(screen.getByRole("button", { name: /Find My Meal/i }));
+
+			await waitFor(() => {
+				expect(screen.getByText("Server error")).toBeInTheDocument();
+			});
+		});
+
+		test("displays fallback error message when no response", async () => {
+			api.get.mockRejectedValue(new Error("Network error"));
+
+			renderWithProviders(<SmartOrder />);
+			fireEvent.click(screen.getByRole("button", { name: /Find My Meal/i }));
+
+			await waitFor(() => {
+				expect(screen.getByText("Failed to load suggestions")).toBeInTheDocument();
+			});
+		});
+	});
+
+	// ================== CART INTEGRATION TESTS ==================
+	describe("Cart Integration", () => {
+		test("calls addToCart when Add button is clicked", async () => {
+			const mockItem = { _id: "item1", name: "Coffee", price: 3, reasons: [] };
+			api.get.mockResolvedValue({ data: { suggestions: [mockItem] } });
+
+			renderWithProviders(<SmartOrder />);
+			fireEvent.click(screen.getByRole("button", { name: /Find My Meal/i }));
+
+			await waitFor(() => {
+				expect(screen.getByText("Coffee")).toBeInTheDocument();
+			});
+
+			fireEvent.click(screen.getByText("Add to Cart"));
+			expect(mockAddToCart).toHaveBeenCalledWith(mockItem);
 		});
 	});
 });
