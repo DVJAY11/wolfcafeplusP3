@@ -37,7 +37,7 @@ Base URL (local dev):
 
 ## 👤 Auth Routes
 
-**Prefix:** `/api/auth` :contentReference[oaicite:1]{index=1}  
+**Prefix:** `/api/auth`
 
 | Method | Endpoint        | Description                            | Auth | Role |
 |--------|-----------------|----------------------------------------|------|------|
