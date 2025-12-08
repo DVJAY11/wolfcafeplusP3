@@ -392,5 +392,154 @@ describe("🥗 Ingredient Controller", () => {
 			expect(call.conflicts.length).toBeGreaterThan(0);
 			expect(call.conflicts[0]).toContain("unavailable");
 		});
+
+		// ==================== BUILD-YOUR-OWN SPECIFIC TESTS ====================
+		it("BYO-1: should handle empty ingredientIds array (no ingredients)", async () => {
+			const baseItem = await MenuItem.create({
+				name: "Coffee",
+				price: 3.0,
+				available: true,
+			});
+
+			const req = {
+				body: {
+					baseItemId: baseItem._id.toString(),
+					ingredientIds: [],
+				},
+			};
+			const res = mockRes();
+
+			await validateCustomItem(req, res);
+
+			expect(res.status).toHaveBeenCalledWith(200);
+			const result = res.json.mock.calls[0][0];
+			expect(result.totalPrice).toBe(3.0); // Only base price
+			expect(result.valid).toBe(true);
+		});
+
+		it("BYO-2: should return 400 for unavailable base item", async () => {
+			const unavailableBase = await MenuItem.create({
+				name: "Unavailable Coffee",
+				price: 5.0,
+				available: false,
+			});
+
+			const ingredient = await Ingredient.create({
+				name: "Syrup",
+				price: 0.5,
+				category: "flavoring",
+				available: true,
+			});
+
+			const req = {
+				body: {
+					baseItemId: unavailableBase._id.toString(),
+					ingredientIds: [ingredient._id.toString()],
+				},
+			};
+			const res = mockRes();
+
+			await validateCustomItem(req, res);
+
+			expect(res.status).toHaveBeenCalledWith(400);
+			expect(res.json).toHaveBeenCalledWith(
+				expect.objectContaining({
+					message: "Base item is not available",
+				})
+			);
+		});
+
+		it("BYO-3: should calculate price correctly with zero-price ingredients", async () => {
+			const baseItem = await MenuItem.create({
+				name: "Coffee",
+				price: 3.0,
+				available: true,
+			});
+
+			const freeIngredient = await Ingredient.create({
+				name: "Free Sugar",
+				price: 0,
+				category: "other",
+				available: true,
+			});
+
+			const req = {
+				body: {
+					baseItemId: baseItem._id.toString(),
+					ingredientIds: [freeIngredient._id.toString()],
+				},
+			};
+			const res = mockRes();
+
+			await validateCustomItem(req, res);
+
+			expect(res.status).toHaveBeenCalledWith(200);
+			const result = res.json.mock.calls[0][0];
+			expect(result.totalPrice).toBe(3.0); // Base price only
+		});
+
+		it("BYO-4: should store applicableFor field for section filtering", async () => {
+			const drinkIngredient = await Ingredient.create({
+				name: "Coffee Syrup",
+				price: 0.5,
+				category: "flavoring",
+				available: true,
+				applicableFor: ["drink"],
+			});
+
+			const mainIngredient = await Ingredient.create({
+				name: "Cheese",
+				price: 1.0,
+				category: "dairy",
+				available: true,
+				applicableFor: ["main"],
+			});
+
+			// Query all ingredients
+			const req = { query: {} };
+			const res = mockRes();
+
+			await getIngredients(req, res);
+
+			const ingredients = res.json.mock.calls[0][0].ingredients;
+			const drinkOnly = ingredients.filter(
+				(i) => i.applicableFor && i.applicableFor.includes("drink")
+			);
+			const mainOnly = ingredients.filter(
+				(i) => i.applicableFor && i.applicableFor.includes("main")
+			);
+
+			expect(drinkOnly.length).toBe(1);
+			expect(drinkOnly[0].name).toBe("Coffee Syrup");
+			expect(mainOnly.length).toBe(1);
+			expect(mainOnly[0].name).toBe("Cheese");
+		});
+
+		it("BYO-5: should detect multiple dietary conflicts simultaneously", async () => {
+			const conflictIngredient = await Ingredient.create({
+				name: "Cheese Croissant",
+				price: 2.0,
+				category: "bread",
+				available: true,
+				allergens: ["dairy", "gluten"],
+			});
+
+			const req = {
+				body: {
+					ingredientIds: [conflictIngredient._id.toString()],
+					dietaryRestrictions: ["vegan", "gluten-free"],
+				},
+			};
+			const res = mockRes();
+
+			await validateCustomItem(req, res);
+
+			expect(res.status).toHaveBeenCalledWith(200);
+			const result = res.json.mock.calls[0][0];
+			expect(result.valid).toBe(false);
+			expect(result.conflicts.length).toBeGreaterThanOrEqual(2);
+			expect(result.conflicts.some(c => c.includes("vegan") || c.includes("animal"))).toBe(true);
+			expect(result.conflicts.some(c => c.includes("gluten"))).toBe(true);
+		});
 	});
 });

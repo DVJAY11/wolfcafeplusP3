@@ -10,8 +10,6 @@ jest.mock("../context/CartContext", () => ({
 	useCart: jest.fn(),
 }));
 
-// Removed AuthContext mock to use real context with Provider
-
 jest.mock("../context/ModalContext", () => ({
 	useModal: jest.fn(),
 }));
@@ -20,17 +18,6 @@ jest.mock("react-router-dom", () => ({
 	...jest.requireActual("react-router-dom"),
 	useNavigate: jest.fn(),
 }));
-
-jest.mock("../components/IngredientSelector", () => (props) => (
-	<div
-		data-testid={ `ingredient-${props.ingredient._id}` }
-		onClick={ () => props.onToggle(props.ingredient._id) }
-		data-selected={ props.isSelected }
-		data-disabled={ props.disabled }
-	>
-		{ props.ingredient.name } - ${ props.ingredient.price }
-	</div>
-));
 
 import React from "react";
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
@@ -43,8 +30,9 @@ import { useNavigate } from "react-router-dom";
 
 describe("🛠️ Build Your Own Page", () => {
 	const mockAddToCart = jest.fn();
-	const mockNavigate = jest.fn();
+	const mockFetchCart = jest.fn();
 	const mockShowLoginModal = jest.fn();
+	const mockNavigate = jest.fn();
 
 	// Helper to render with AuthContext
 	const renderWithAuth = (ui, user = { _id: "user1", name: "Test User" }) => {
@@ -56,8 +44,9 @@ describe("🛠️ Build Your Own Page", () => {
 	};
 
 	const sampleMenuItems = [
-		{ _id: "menu1", name: "Coffee", price: 3.0, available: true },
-		{ _id: "menu2", name: "Sandwich", price: 5.0, available: true },
+		{ _id: "menu1", name: "Coffee", price: 3.0, available: true, itemGroup: "drink" },
+		{ _id: "menu2", name: "Sandwich", price: 5.0, available: true, itemGroup: "main" },
+		{ _id: "menu3", name: "Cookie", price: 2.0, available: true, itemGroup: "side" },
 	];
 
 	const sampleIngredients = [
@@ -69,6 +58,7 @@ describe("🛠️ Build Your Own Page", () => {
 			available: true,
 			allergens: [],
 			dietaryTags: ["vegan"],
+			applicableFor: ["drink"],
 		},
 		{
 			_id: "ing2",
@@ -78,22 +68,23 @@ describe("🛠️ Build Your Own Page", () => {
 			available: true,
 			allergens: ["dairy"],
 			dietaryTags: [],
+			applicableFor: ["drink"],
 		},
 		{
 			_id: "ing3",
-			name: "Almond Milk",
-			price: 0.75,
+			name: "Cheese",
+			price: 1.0,
 			category: "dairy",
 			available: true,
-			allergens: ["nuts"],
-			dietaryTags: ["vegan", "dairy-free"],
+			allergens: ["dairy"],
+			dietaryTags: [],
+			applicableFor: ["main"],
 		},
 	];
 
 	beforeEach(() => {
 		jest.clearAllMocks();
-		useCart.mockReturnValue({ addToCart: mockAddToCart });
-		// useAuth mock removed
+		useCart.mockReturnValue({ addToCart: mockAddToCart, fetchCart: mockFetchCart });
 		useModal.mockReturnValue({ showLoginModal: mockShowLoginModal });
 		useNavigate.mockReturnValue(mockNavigate);
 
@@ -110,23 +101,35 @@ describe("🛠️ Build Your Own Page", () => {
 		api.post.mockResolvedValue({ data: {} });
 	});
 
+	// ==================== CORE TESTS ====================
+
 	test("renders loading state initially", () => {
-		render(<BuildYourOwn />);
-		expect(screen.getByText(/Loading/i)).toBeInTheDocument();
+		renderWithAuth(<BuildYourOwn />);
+		expect(screen.getByText(/Loading menu/i)).toBeInTheDocument();
 	});
 
-	test("renders step 1 (base selection) after loading", async () => {
-		render(<BuildYourOwn />);
+	test("renders step 1 (drink selection) after loading", async () => {
+		renderWithAuth(<BuildYourOwn />);
 		await waitFor(() =>
-			expect(screen.getByText(/Step 1: Choose Your Base/i)).toBeInTheDocument()
+			expect(screen.getByText(/Choose Your Drink/i)).toBeInTheDocument()
 		);
-		expect(screen.getByText(/Start from Scratch/i)).toBeInTheDocument();
 		expect(screen.getByText("Coffee")).toBeInTheDocument();
-		expect(screen.getByText("Sandwich")).toBeInTheDocument();
 	});
 
-	test("allows selecting a base item and proceeding to step 2", async () => {
-		render(<BuildYourOwn />);
+	test("shows progress bar with all steps", async () => {
+		renderWithAuth(<BuildYourOwn />);
+		await waitFor(() =>
+			expect(screen.getByText("Coffee")).toBeInTheDocument()
+		);
+
+		expect(screen.getByText("Drink")).toBeInTheDocument();
+		expect(screen.getByText("Main")).toBeInTheDocument();
+		expect(screen.getByText("Side")).toBeInTheDocument();
+		expect(screen.getByText("Review")).toBeInTheDocument();
+	});
+
+	test("allows selecting a drink and proceeding to main step", async () => {
+		renderWithAuth(<BuildYourOwn />);
 		await waitFor(() =>
 			expect(screen.getByText("Coffee")).toBeInTheDocument()
 		);
@@ -136,107 +139,28 @@ describe("🛠️ Build Your Own Page", () => {
 		fireEvent.click(coffeeOption);
 
 		// Click Next
-		const nextButton = screen.getByText(/Next: Choose Ingredients/i);
+		const nextButton = screen.getByText(/Next →/i);
 		fireEvent.click(nextButton);
 
 		// Should be on step 2
 		await waitFor(() =>
-			expect(screen.getByText(/Step 2: Select Your Ingredients/i)).toBeInTheDocument()
+			expect(screen.getByText(/Choose Your Main/i)).toBeInTheDocument()
 		);
+		expect(screen.getByText("Sandwich")).toBeInTheDocument();
 	});
 
-	test("allows selecting ingredients in step 2", async () => {
-		render(<BuildYourOwn />);
+	test("Next button is disabled when no base item is selected", async () => {
+		renderWithAuth(<BuildYourOwn />);
 		await waitFor(() =>
 			expect(screen.getByText("Coffee")).toBeInTheDocument()
 		);
 
-		// Go to step 2
-		const nextButton = screen.getByText(/Next: Choose Ingredients/i);
-		fireEvent.click(nextButton);
-
-		await waitFor(() =>
-			expect(screen.getByText(/Step 2: Select Your Ingredients/i)).toBeInTheDocument()
-		);
-
-		// Select Vanilla Syrup
-		const vanillaOption = screen.getByTestId("ingredient-ing1");
-		fireEvent.click(vanillaOption);
-
-		// Should show selected count
-		expect(screen.getByText(/selected: 1/i)).toBeInTheDocument();
+		const nextButton = screen.getByText(/Next →/i);
+		expect(nextButton).toBeDisabled();
 	});
 
-	test("calculates total price correctly", async () => {
-		render(<BuildYourOwn />);
-		await waitFor(() =>
-			expect(screen.getByText("Coffee")).toBeInTheDocument()
-		);
-
-		// Select Coffee ($3.00)
-		const coffeeOption = screen.getByText("Coffee").closest("div");
-		fireEvent.click(coffeeOption);
-
-		// Go to step 2
-		let nextButton = screen.getByText(/Next: Choose Ingredients/i);
-		fireEvent.click(nextButton);
-
-		await waitFor(() =>
-			expect(screen.getByText(/Step 2: Select Your Ingredients/i)).toBeInTheDocument()
-		);
-
-		// Select Vanilla Syrup ($0.50)
-		const vanillaOption = screen.getByTestId("ingredient-ing1");
-		fireEvent.click(vanillaOption);
-
-		// Go to step 3
-		nextButton = screen.getByText(/Next: Dietary Filters/i);
-		fireEvent.click(nextButton);
-
-		await waitFor(() =>
-			expect(screen.getByText(/Step 3: Dietary Restrictions & Summary/i)).toBeInTheDocument()
-		);
-
-		// Should show total: $3.50
-		expect(screen.getByText(/Total: \$3\.50/i)).toBeInTheDocument();
-	});
-
-	test("allows toggling dietary restrictions", async () => {
-		render(<BuildYourOwn />);
-		await waitFor(() =>
-			expect(screen.getByText("Coffee")).toBeInTheDocument()
-		);
-
-		// Go to step 2
-		let nextButton = screen.getByText(/Next: Choose Ingredients/i);
-		fireEvent.click(nextButton);
-
-		await waitFor(() =>
-			expect(screen.getByText(/Step 2: Select Your Ingredients/i)).toBeInTheDocument()
-		);
-
-		// Select ingredient
-		const vanillaOption = screen.getByTestId("ingredient-ing1");
-		fireEvent.click(vanillaOption);
-
-		// Go to step 3
-		nextButton = screen.getByText(/Next: Dietary Filters/i);
-		fireEvent.click(nextButton);
-
-		await waitFor(() =>
-			expect(screen.getByText(/Step 3: Dietary Restrictions & Summary/i)).toBeInTheDocument()
-		);
-
-		// Toggle vegan filter
-		const veganButton = screen.getByText("vegan");
-		fireEvent.click(veganButton);
-
-		// Should show checkmark
-		expect(screen.getByText(/✓ vegan/i)).toBeInTheDocument();
-	});
-
-	test("calls API to add custom item to cart", async () => {
-		render(<BuildYourOwn />);
+	test("Next button is enabled after selecting a base item", async () => {
+		renderWithAuth(<BuildYourOwn />);
 		await waitFor(() =>
 			expect(screen.getByText("Coffee")).toBeInTheDocument()
 		);
@@ -245,174 +169,308 @@ describe("🛠️ Build Your Own Page", () => {
 		const coffeeOption = screen.getByText("Coffee").closest("div");
 		fireEvent.click(coffeeOption);
 
-		// Go to step 2
-		let nextButton = screen.getByText(/Next: Choose Ingredients/i);
-		fireEvent.click(nextButton);
+		const nextButton = screen.getByText(/Next →/i);
+		expect(nextButton).not.toBeDisabled();
+	});
 
+	test("Skip button advances to next step and clears selection", async () => {
+		renderWithAuth(<BuildYourOwn />);
 		await waitFor(() =>
-			expect(screen.getByText(/Step 2: Select Your Ingredients/i)).toBeInTheDocument()
+			expect(screen.getByText("Coffee")).toBeInTheDocument()
 		);
 
-		// Select Vanilla Syrup
-		const vanillaOption = screen.getByTestId("ingredient-ing1");
-		fireEvent.click(vanillaOption);
+		// Select Coffee first
+		const coffeeOption = screen.getByText("Coffee").closest("div");
+		fireEvent.click(coffeeOption);
 
-		// Go to step 3
-		nextButton = screen.getByText(/Next: Dietary Filters/i);
-		fireEvent.click(nextButton);
+		// Click Skip
+		const skipButton = screen.getByText(/Skip/i);
+		fireEvent.click(skipButton);
+
+		// Should be on step 2
+		await waitFor(() =>
+			expect(screen.getByText(/Choose Your Main/i)).toBeInTheDocument()
+		);
+	});
+
+	test("can navigate to any step via progress bar", async () => {
+		renderWithAuth(<BuildYourOwn />);
+		await waitFor(() =>
+			expect(screen.getByText("Coffee")).toBeInTheDocument()
+		);
+
+		// Click step 3 in progress bar
+		const step3Button = screen.getByText("3").closest("button");
+		fireEvent.click(step3Button);
 
 		await waitFor(() =>
-			expect(screen.getByText(/Step 3: Dietary Restrictions & Summary/i)).toBeInTheDocument()
+			expect(screen.getByText(/Choose Your Side/i)).toBeInTheDocument()
+		);
+		expect(screen.getByText("Cookie")).toBeInTheDocument();
+	});
+
+	test("can navigate to review step via progress bar", async () => {
+		renderWithAuth(<BuildYourOwn />);
+		await waitFor(() =>
+			expect(screen.getByText("Coffee")).toBeInTheDocument()
+		);
+
+		// Click step 4 in progress bar
+		const step4Button = screen.getByText("4").closest("button");
+		fireEvent.click(step4Button);
+
+		await waitFor(() =>
+			expect(screen.getByText(/Review Your Meal/i)).toBeInTheDocument()
+		);
+	});
+
+	test("Back button appears on steps after step 1", async () => {
+		renderWithAuth(<BuildYourOwn />);
+		await waitFor(() =>
+			expect(screen.getByText("Coffee")).toBeInTheDocument()
+		);
+
+		// On step 1, Back button should NOT be present
+		expect(screen.queryByText("Back")).not.toBeInTheDocument();
+
+		// Go to step 2
+		const step2Button = screen.getByText("2").closest("button");
+		fireEvent.click(step2Button);
+
+		await waitFor(() =>
+			expect(screen.getByText(/Choose Your Main/i)).toBeInTheDocument()
+		);
+
+		// Now Back button should be present
+		expect(screen.getByText("Back")).toBeInTheDocument();
+	});
+
+	test("Back button navigates to previous step", async () => {
+		renderWithAuth(<BuildYourOwn />);
+		await waitFor(() =>
+			expect(screen.getByText("Coffee")).toBeInTheDocument()
+		);
+
+		// Go to step 2
+		const step2Button = screen.getByText("2").closest("button");
+		fireEvent.click(step2Button);
+
+		await waitFor(() =>
+			expect(screen.getByText(/Choose Your Main/i)).toBeInTheDocument()
+		);
+
+		// Click Back
+		const backButton = screen.getByText("Back");
+		fireEvent.click(backButton);
+
+		// Should be on step 1
+		await waitFor(() =>
+			expect(screen.getByText(/Choose Your Drink/i)).toBeInTheDocument()
+		);
+	});
+
+	test("review step shows Add Meal to Cart button", async () => {
+		renderWithAuth(<BuildYourOwn />);
+		await waitFor(() =>
+			expect(screen.getByText("Coffee")).toBeInTheDocument()
+		);
+
+		// Go to review step
+		const step4Button = screen.getByText("4").closest("button");
+		fireEvent.click(step4Button);
+
+		await waitFor(() =>
+			expect(screen.getByText(/Add Meal to Cart/i)).toBeInTheDocument()
+		);
+	});
+
+	test("shows login modal when adding to cart without being logged in", async () => {
+		// Render without user
+		render(
+			<AuthContext.Provider value={ { user: null } }>
+				<BuildYourOwn />
+			</AuthContext.Provider>
+		);
+
+		await waitFor(() =>
+			expect(screen.getByText("Coffee")).toBeInTheDocument()
+		);
+
+		// Select Coffee
+		const coffeeOption = screen.getByText("Coffee").closest("div");
+		fireEvent.click(coffeeOption);
+
+		// Go to review
+		const step4Button = screen.getByText("4").closest("button");
+		fireEvent.click(step4Button);
+
+		await waitFor(() =>
+			expect(screen.getByText(/Add Meal to Cart/i)).toBeInTheDocument()
 		);
 
 		// Click Add to Cart
-		const addButton = screen.getByText(/Add to Cart/i);
-		fireEvent.click(addButton);
-
-		await waitFor(() => {
-			expect(api.post).toHaveBeenCalledWith(
-				"/cart",
-				expect.objectContaining({
-					menuItem: "menu1",
-					quantity: 1,
-					customizations: expect.arrayContaining([
-						expect.objectContaining({
-							ingredientId: "ing1",
-							name: "Vanilla Syrup",
-							price: 0.5,
-						}),
-					]),
-				})
-			);
-		});
-
-		expect(mockNavigate).toHaveBeenCalledWith("/cart");
-	});
-
-	test("shows login modal if user not authenticated when adding to cart", async () => {
-		renderWithAuth(<BuildYourOwn />, null);
-		await waitFor(() =>
-			expect(screen.getByText("Coffee")).toBeInTheDocument()
-		);
-
-		// Go through steps quickly
-		let nextButton = screen.getByText(/Next: Choose Ingredients/i);
-		fireEvent.click(nextButton);
-
-		await waitFor(() =>
-			expect(screen.getByText(/Step 2: Select Your Ingredients/i)).toBeInTheDocument()
-		);
-
-		const vanillaOption = screen.getByTestId("ingredient-ing1");
-		fireEvent.click(vanillaOption);
-
-		nextButton = screen.getByText(/Next: Dietary Filters/i);
-		fireEvent.click(nextButton);
-
-		await waitFor(() =>
-			expect(screen.getByText(/Step 3: Dietary Restrictions & Summary/i)).toBeInTheDocument()
-		);
-
-		const addButton = screen.getByText(/Add to Cart/i);
+		const addButton = screen.getByText(/Add Meal to Cart/i);
 		fireEvent.click(addButton);
 
 		expect(mockShowLoginModal).toHaveBeenCalled();
-		expect(api.post).not.toHaveBeenCalledWith("/cart", expect.anything());
 	});
 
-	test("allows saving custom item with name", async () => {
-		render(<BuildYourOwn />);
+	test("adds meal to cart and navigates to cart page", async () => {
+		renderWithAuth(<BuildYourOwn />);
 		await waitFor(() =>
 			expect(screen.getByText("Coffee")).toBeInTheDocument()
 		);
 
-		// Go through steps
-		let nextButton = screen.getByText(/Next: Choose Ingredients/i);
-		fireEvent.click(nextButton);
+		// Select Coffee
+		const coffeeOption = screen.getByText("Coffee").closest("div");
+		fireEvent.click(coffeeOption);
+
+		// Go to review
+		const step4Button = screen.getByText("4").closest("button");
+		fireEvent.click(step4Button);
 
 		await waitFor(() =>
-			expect(screen.getByText(/Step 2: Select Your Ingredients/i)).toBeInTheDocument()
+			expect(screen.getByText(/Add Meal to Cart/i)).toBeInTheDocument()
 		);
 
-		const vanillaOption = screen.getByTestId("ingredient-ing1");
-		fireEvent.click(vanillaOption);
-
-		nextButton = screen.getByText(/Next: Dietary Filters/i);
-		fireEvent.click(nextButton);
-
-		await waitFor(() =>
-			expect(screen.getByText(/Step 3: Dietary Restrictions & Summary/i)).toBeInTheDocument()
-		);
-
-		// Enter custom name
-		const nameInput = screen.getByPlaceholderText(/Enter a name/i);
-		fireEvent.change(nameInput, { target: { value: "My Favorite" } });
-
-		// Click Save
-		const saveButton = screen.getByText(/Save Custom Item/i);
-		fireEvent.click(saveButton);
+		// Click Add to Cart
+		const addButton = screen.getByText(/Add Meal to Cart/i);
+		fireEvent.click(addButton);
 
 		await waitFor(() => {
-			expect(api.post).toHaveBeenCalledWith(
-				"/custom-items",
-				expect.objectContaining({
-					name: "My Favorite",
-					ingredients: ["ing1"],
-				})
-			);
+			expect(api.post).toHaveBeenCalledWith("/cart", expect.any(Object));
+		});
+
+		await waitFor(() => {
+			expect(mockFetchCart).toHaveBeenCalled();
+		});
+
+		await waitFor(() => {
+			expect(mockNavigate).toHaveBeenCalledWith("/cart");
 		});
 	});
 
-	test("validates that at least one ingredient is selected", async () => {
-		window.alert = jest.fn();
+	// ==================== BYO-SPECIFIC TESTS ====================
 
-		render(<BuildYourOwn />);
+	test("BYO-1: sides step does not show customization panel", async () => {
+		renderWithAuth(<BuildYourOwn />);
 		await waitFor(() =>
 			expect(screen.getByText("Coffee")).toBeInTheDocument()
 		);
 
-		// Go to step 2 without selecting ingredients
-		let nextButton = screen.getByText(/Next: Choose Ingredients/i);
-		fireEvent.click(nextButton);
+		// Go to step 3 (Side)
+		const step3Button = screen.getByText("3").closest("button");
+		fireEvent.click(step3Button);
 
 		await waitFor(() =>
-			expect(screen.getByText(/Step 2: Select Your Ingredients/i)).toBeInTheDocument()
+			expect(screen.getByText(/Choose Your Side/i)).toBeInTheDocument()
 		);
 
-		// Try to go to step 3 without selecting anything - button should be disabled
-		nextButton = screen.getByText(/Next: Dietary Filters/i);
-		expect(nextButton).toBeDisabled();
+		// Should NOT show the "Customize" text since sides don't have customizations
+		expect(screen.queryByText(/Customize/i)).not.toBeInTheDocument();
 	});
 
-	test("handles API errors gracefully", async () => {
-		const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => { });
-		api.get.mockRejectedValueOnce(new Error("Network error"));
-
-		render(<BuildYourOwn />);
-		await waitFor(() => expect(consoleSpy).toHaveBeenCalled());
-		consoleSpy.mockRestore();
-	});
-
-	test("allows navigating back between steps", async () => {
-		render(<BuildYourOwn />);
+	test("BYO-2: review step displays selected items", async () => {
+		renderWithAuth(<BuildYourOwn />);
 		await waitFor(() =>
 			expect(screen.getByText("Coffee")).toBeInTheDocument()
 		);
 
-		// Go to step 2
-		let nextButton = screen.getByText(/Next: Choose Ingredients/i);
-		fireEvent.click(nextButton);
+		// Select Coffee
+		const coffeeOption = screen.getByText("Coffee").closest("div");
+		fireEvent.click(coffeeOption);
+
+		// Go to review
+		const step4Button = screen.getByText("4").closest("button");
+		fireEvent.click(step4Button);
 
 		await waitFor(() =>
-			expect(screen.getByText(/Step 2: Select Your Ingredients/i)).toBeInTheDocument()
+			expect(screen.getByText(/Review Your Meal/i)).toBeInTheDocument()
 		);
 
-		// Go back to step 1
-		const backButton = screen.getByText(/← Back/i);
-		fireEvent.click(backButton);
+		// Should display section labels
+		expect(screen.getByText("drink")).toBeInTheDocument();
+		expect(screen.getByText("main")).toBeInTheDocument();
+		expect(screen.getByText("side")).toBeInTheDocument();
+
+		// Should show Coffee as the selected drink
+		expect(screen.getByText("Coffee")).toBeInTheDocument();
+	});
+
+	test("BYO-3: review step shows total price", async () => {
+		renderWithAuth(<BuildYourOwn />);
+		await waitFor(() =>
+			expect(screen.getByText("Coffee")).toBeInTheDocument()
+		);
+
+		// Select Coffee ($3.00)
+		const coffeeOption = screen.getByText("Coffee").closest("div");
+		fireEvent.click(coffeeOption);
+
+		// Go to review
+		const step4Button = screen.getByText("4").closest("button");
+		fireEvent.click(step4Button);
 
 		await waitFor(() =>
-			expect(screen.getByText(/Step 1: Choose Your Base/i)).toBeInTheDocument()
+			expect(screen.getByText(/Review Your Meal/i)).toBeInTheDocument()
 		);
+
+		// Should show total
+		expect(screen.getByText(/Total:/i)).toBeInTheDocument();
+		// Price may appear in multiple places (card and total), just check it exists
+		const priceElements = screen.getAllByText("$3.00");
+		expect(priceElements.length).toBeGreaterThan(0);
+	});
+
+	test("BYO-4: mealGroupId is included when adding to cart", async () => {
+		renderWithAuth(<BuildYourOwn />);
+		await waitFor(() =>
+			expect(screen.getByText("Coffee")).toBeInTheDocument()
+		);
+
+		// Select Coffee
+		const coffeeOption = screen.getByText("Coffee").closest("div");
+		fireEvent.click(coffeeOption);
+
+		// Go to review
+		const step4Button = screen.getByText("4").closest("button");
+		fireEvent.click(step4Button);
+
+		await waitFor(() =>
+			expect(screen.getByText(/Add Meal to Cart/i)).toBeInTheDocument()
+		);
+
+		// Click Add to Cart
+		const addButton = screen.getByText(/Add Meal to Cart/i);
+		fireEvent.click(addButton);
+
+		await waitFor(() => {
+			expect(api.post).toHaveBeenCalled();
+		});
+
+		// Verify mealGroupId is in the payload
+		const callArgs = api.post.mock.calls[0][1];
+		expect(callArgs.items).toBeDefined();
+		expect(callArgs.items[0].mealGroupId).toBeDefined();
+		expect(callArgs.items[0].mealGroupId.length).toBeGreaterThan(0);
+	});
+
+	test("BYO-5: review step has Edit buttons for each section", async () => {
+		renderWithAuth(<BuildYourOwn />);
+		await waitFor(() =>
+			expect(screen.getByText("Coffee")).toBeInTheDocument()
+		);
+
+		// Go to review
+		const step4Button = screen.getByText("4").closest("button");
+		fireEvent.click(step4Button);
+
+		await waitFor(() =>
+			expect(screen.getByText(/Review Your Meal/i)).toBeInTheDocument()
+		);
+
+		// Should show Edit buttons
+		const editButtons = screen.getAllByText("Edit");
+		expect(editButtons.length).toBe(3); // One for drink, main, side
 	});
 });
