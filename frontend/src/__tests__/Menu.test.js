@@ -1,3 +1,9 @@
+jest.mock("../context/GroupOrderContext", () => ({
+  useGroupOrder: () => ({
+    groupOrder: null,        // or a fake open group order if you want
+    setGroupOrder: jest.fn(),
+  }),
+}));
 
 // 🚨 Mock axios before importing component
 jest.mock("../api/axios", () => ({

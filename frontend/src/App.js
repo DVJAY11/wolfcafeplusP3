@@ -11,6 +11,7 @@ import { CartProvider } from "./context/CartContext";
 import AuthProvider from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminProtectedRoute from "./components/AdminProtectedRoute";
+import { GroupOrderProvider } from "./context/GroupOrderContext";
 
 import AdminLayout from "./pages/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -19,6 +20,9 @@ import ManageItems from "./pages/admin/ManageItems";
 import ManageIngredients from "./pages/admin/ManageIngredients";
 import { ModalProvider } from "./context/ModalContext";
 
+import GroupOrder from "./pages/GroupOrder";
+import GroupOrderSession from "./pages/GroupOrderSession";
+import MyGroupOrders from "./pages/MyGroupOrders";
 // ✅ Wrapper to handle conditional padding
 function PageWrapper({ children }) {
   const location = useLocation();
@@ -33,36 +37,46 @@ function App() {
     <AuthProvider>
       <ModalProvider>
         <CartProvider>
-          <Router>
-            <PageWrapper>
-              <Navbar />
-              <Routes>
-                {/* 🌐 Public routes */ }
-                <Route path="/" element={ <Home /> } />
-                <Route path="/menu" element={ <Menu /> } />
-                <Route path="/cart" element={ <Cart /> } />
-                <Route path="/about" element={ <AboutUs /> } />
-                <Route path="/login" element={ <Login /> } />
-                <Route path="/build-your-own" element={ <BuildYourOwn /> } />
-
-                {/* 🔒 Authenticated (non-admin) protected routes */ }
-                <Route element={ <ProtectedRoute /> }>
-                  {/* example placeholder; you can add user-only routes here */ }
-                  {/* <Route path="/profile" element={<UserProfile />} /> */ }
-                </Route>
-
-                {/* 🧑‍💼 Admin-only protected routes */ }
-                <Route element={ <AdminProtectedRoute /> }>
-                  <Route path="/admin" element={ <AdminLayout /> }>
-                    <Route index element={ <AdminDashboard /> } />
-                    <Route path="orders" element={ <ManageOrders /> } />
-                    <Route path="items" element={ <ManageItems /> } />
-                    <Route path="ingredients" element={ <ManageIngredients /> } />
+          {/* 👉 Wrap the app tree with GroupOrderProvider */}
+          <GroupOrderProvider>
+            <Router>
+              <PageWrapper>
+                <Navbar />
+                <Routes>
+                  {/* 🌐 Public routes */}
+                  <Route path="/" element={<Home />} />
+                  <Route path="/menu" element={<Menu />} />
+                  <Route path="/cart" element={<Cart />} />
+                  <Route path="/about" element={<AboutUs />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/build-your-own" element={<BuildYourOwn />} />
+                  
+                  {/* 🔒 Authenticated (non-admin) protected routes */}
+                  <Route element={<ProtectedRoute />}>
+                    {/* 👉 Group Order routes should require login */}
+                    <Route path="/group-order" element={<GroupOrder />} />
+                    <Route
+                      path="/group-order/:shareCode"
+                      element={<GroupOrderSession />}
+                    />
+                    <Route path="/my-group-orders" element={<MyGroupOrders />} />
+                    {/* example placeholder; you can add user-only routes here */}
+                    {/* <Route path="/profile" element={<UserProfile />} /> */}
                   </Route>
-                </Route>
-              </Routes>
-            </PageWrapper>
-          </Router>
+
+                  {/* 🧑‍💼 Admin-only protected routes */}
+                  <Route element={<AdminProtectedRoute />}>
+                    <Route path="/admin" element={<AdminLayout />}>
+                      <Route index element={<AdminDashboard />} />
+                      <Route path="orders" element={<ManageOrders />} />
+                      <Route path="items" element={<ManageItems />} />
+                      <Route path="ingredients" element={<ManageIngredients />} />
+                    </Route>
+                  </Route>
+                </Routes>
+              </PageWrapper>
+            </Router>
+          </GroupOrderProvider>
         </CartProvider>
       </ModalProvider>
     </AuthProvider>

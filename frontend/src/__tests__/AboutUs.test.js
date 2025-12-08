@@ -46,7 +46,7 @@ describe("🦊 About Page", () => {
 
   test("renders Meet the Team section", () => {
     expect(screen.getByText(/Meet the Team/i)).toBeInTheDocument();
-    ["Dhruva Kamble", "Rishitha Ramesh", "Rujuta Budke"].forEach((name) =>
+    ["Digvijay Sonvane", "Suyesh Jadhav", "Vanaja Agarwal"].forEach((name) =>
       expect(screen.getByText(name)).toBeInTheDocument()
     );
     const githubLinks = screen.getAllByRole("link");
