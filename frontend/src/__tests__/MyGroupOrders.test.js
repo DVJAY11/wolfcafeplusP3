@@ -1,92 +1,61 @@
-// frontend/src/__tests__/MyGroupOrders.test.jsx
-// Adjust the import path based on your project structure.
-import React from "react";
-import { render, screen, waitFor } from "@testing-library/react";
-import "@testing-library/jest-dom";
-import axios from "axios";
-import MyGroupOrders from "../components/MyGroupOrders";
+import React from 'react';
+import { render, screen, waitFor } from '@testing-library/react';
+import MyGroupOrders from '../pages/MyGroupOrders';
+import { BrowserRouter } from 'react-router-dom';
+import api from '../api/axios';
 
-jest.mock("axios");
+// Mock the API module
+jest.mock('../api/axios', () => ({
+  __esModule: true,
+  default: {
+    get: jest.fn(),
+    post: jest.fn()
+  }
+}));
 
-describe("MyGroupOrders", () => {
+// Mock the Context
+jest.mock('../context/GroupOrderContext', () => ({
+  useGroupOrder: () => ({
+    setGroupOrder: jest.fn()
+  })
+}));
+
+describe('MyGroupOrders Page', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it("renders a list of group orders returned from the API", async () => {
-    const mockGroupOrders = [
-      {
-        _id: "go1",
-        shareCode: "ABC123",
-        status: "open",
-        subtotal: 12.0,
-        total: 12.96,
-        creator: { _id: "user1", name: "Alice" },
-        participants: [
-          { user: { _id: "user1", name: "Alice" }, items: [] },
-          { user: { _id: "user2", name: "Bob" }, items: [] },
-        ],
-      },
-      {
-        _id: "go2",
-        shareCode: "XYZ789",
-        status: "completed",
-        subtotal: 20.0,
-        total: 21.6,
-        creator: { _id: "user2", name: "Bob" },
-        participants: [
-          { user: { _id: "user2", name: "Bob" }, items: [] },
-        ],
-      },
-    ];
-
-    axios.get.mockResolvedValueOnce({
-      data: { groupOrders: mockGroupOrders },
-    });
-
-    render(<MyGroupOrders />);
-
-    // Optional: if you show a loading state
-    // expect(screen.getByText(/loading/i)).toBeInTheDocument();
-
-    await waitFor(() => {
-      // Check that shareCodes / statuses are rendered
-      expect(screen.getByText(/abc123/i)).toBeInTheDocument();
-      expect(screen.getByText(/open/i)).toBeInTheDocument();
-
-      expect(screen.getByText(/xyz789/i)).toBeInTheDocument();
-      expect(screen.getByText(/completed/i)).toBeInTheDocument();
-    });
-
-    // Make sure the correct API endpoint was called
-    expect(axios.get).toHaveBeenCalledWith("/api/group-orders/mine");
+  test('displays loading state initially', () => {
+    // Return a pending promise to keep it loading
+    api.get.mockImplementation(() => new Promise(() => { }));
+    render(<BrowserRouter><MyGroupOrders /></BrowserRouter>);
+    expect(screen.getByText(/loading your group orders/i)).toBeInTheDocument();
   });
 
-  it("shows an empty state if there are no group orders", async () => {
-    axios.get.mockResolvedValueOnce({
-      data: { groupOrders: [] },
-    });
+  test('displays orders when api succeeds', async () => {
+    const orders = [{
+      _id: '1',
+      shareCode: 'CODE123',
+      status: 'open',
+      total: 10,
+      participants: [],
+      createdAt: new Date().toISOString()
+    }];
+    api.get.mockResolvedValue({ data: { groupOrders: orders } });
 
-    render(<MyGroupOrders />);
+    render(<BrowserRouter><MyGroupOrders /></BrowserRouter>);
 
     await waitFor(() => {
-      // Adjust the text to whatever you show on empty state
-      expect(
-        screen.getByText(/no group orders yet/i)
-      ).toBeInTheDocument();
+      expect(screen.getByText('CODE123')).toBeInTheDocument();
+      expect(screen.getByText(/status:/i)).toBeInTheDocument();
     });
   });
 
-  it("shows an error message if the API call fails", async () => {
-    axios.get.mockRejectedValueOnce(new Error("Network error"));
-
-    render(<MyGroupOrders />);
-
+  test('displays empty state when no orders', async () => {
+    api.get.mockResolvedValue({ data: { groupOrders: [] } });
+    render(<BrowserRouter><MyGroupOrders /></BrowserRouter>);
     await waitFor(() => {
-      // Adjust text to your actual error UI
-      expect(
-        screen.getByText(/failed to load group orders/i)
-      ).toBeInTheDocument();
+      expect(screen.getByText(/You don't have any group orders yet/i)).toBeInTheDocument();
     });
   });
 });

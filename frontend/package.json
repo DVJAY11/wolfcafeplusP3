@@ -54,5 +54,13 @@
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.18"
   },
+  "jest": {
+    "moduleNameMapper": {
+      "^axios$": "<rootDir>/node_modules/axios/dist/node/axios.cjs"
+    },
+    "transformIgnorePatterns": [
+      "node_modules/(?!(axios|lucide-react|react-icons)/)"
+    ]
+  },
   "lint": "eslint ."
 }
